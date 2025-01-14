@@ -1,8 +1,8 @@
-# Your startup name here
+# Tournevent Tracker
 
 [My Notes](notes.md)
 
-A brief description of the application here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The Tournevent Tracker is designed to provide athletes with timely and relevant updates when at a competition. It provides to the competitor a list of individual events that the competitor expects to participate in, along with constant updates to inform the athlete that their round or match will be starting soon and where exactly they need to be; extremely helpful for events with large venues. Tournevent also keeps track of the competitors performance and will show them their scores or ranking.
 
 
 > [!NOTE]
@@ -26,37 +26,34 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 ### Elevator pitch
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The Tournevent Tracker is designed to provide athletes with timely and relevant updates when at a competition. It provides to the competitor a list of individual events that the competitor expects to participate in, along with constant updates to inform the athlete that their round or match will be starting soon and where exactly they need to be; extremely helpful for events with large venues. Tournevent also keeps track of the competitors performance and will show them their scores or ranking.
 
 ### Design
 
-![Design image](placeholder.png)
+![20250113_202414](https://github.com/user-attachments/assets/9684a88d-c867-4992-99df-21a16de82bdb)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+![20250113_202409](https://github.com/user-attachments/assets/17b57e7f-140f-4c91-9030-fc5b81629eac)
 
-```mermaid
-sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
-```
+![20250113_202404](https://github.com/user-attachments/assets/5ad0ddc5-9766-4601-91ca-e0b4a1dc3c69)
 
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+-login screen with option to log in as an admin or sompetitor
+-competitor information (& potentially opponent information)
+-admin screen used by tournament overseers to update general tournament info.
+-competitor screen used by the athletes to inform them when, and where they need to be.
+-scoring information(unsure if this will be stored with the competitor individually or in a seperate database.
 
 ### Technologies
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
+- **HTML** - HTML will be used to create the skeleton of the web pages. For now, there will be two or three individual pages such as a login page, an admin page, and a competitor page. It will include things such as buttons for the admins to use to edit tourament progress and list elements for the competitor that show where they need to be and when.
+- **CSS** - CSS will be used to give these pages a unique design. It will likely be simple, as we want the competitors to be able to easily read updates and such. it will also help buttons and text input fields to stand out more for the admins so that they can easily make necessary changes.
 - **React** - Description here
-- **Service** - Description here
+- **Service** - Services used will likely be a "SaveScores" service that would hold on to he competitors scores so that they can be awarded properly for their performance
 - **DB/Login** - Description here
-- **WebSocket** - Description here
+- **WebSocket** - Websocket will be used to give timely updates to the competitors. When an admin makes a change uch as updating the match number, or changing the ring that a certain evet will be held in, the competitors will be informed immediately with messages such as "you are 5 matches from competing, please get ready and report to ring 2." or "your match has been moved to ring 3." among others
 
 ## 🚀 AWS deliverable
 
