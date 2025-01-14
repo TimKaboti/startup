@@ -21,7 +21,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] Proper use of Markdown
 - [x] A concise and compelling elevator pitch
 - [x] Description of key features
-- [ ] Description of how you will use each technology
+- [x] Description of how you will use each technology
 - [x] One or more rough sketches of your application. Images must be embedded in this file using Markdown image references.
 
 ### Elevator pitch
@@ -50,9 +50,9 @@ I am going to use the required technologies in the following ways.
 
 - **HTML** - HTML will be used to create the skeleton of the web pages. For now, there will be two or three individual pages such as a login page, an admin page, and a competitor page. It will include things such as buttons for the admins to use to edit tourament progress and list elements for the competitor that show where they need to be and when.
 - **CSS** - CSS will be used to give these pages a unique design. It will likely be simple, as we want the competitors to be able to easily read updates and such. it will also help buttons and text input fields to stand out more for the admins so that they can easily make necessary changes.
-- **React** - Description here
+- **React** - React will be used in response to user input; such as when a user pushes a button or provides information.
 - **Service** - Services used will likely be a "SaveScores" service that would hold on to he competitors scores so that they can be awarded properly for their performance
-- **DB/Login** - Description here
+- **DB/Login** - a Database will be used to store user information. such as their name, username, password, and their score.
 - **WebSocket** - Websocket will be used to give timely updates to the competitors. When an admin makes a change uch as updating the match number, or changing the ring that a certain evet will be held in, the competitors will be informed immediately with messages such as "you are 5 matches from competing, please get ready and report to ring 2." or "your match has been moved to ring 3." among others
 
 ## 🚀 AWS deliverable
