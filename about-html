@@ -8,7 +8,7 @@
 <header>
     <h1>Tournevent</h1>
     <div id="picture" class="picture-box"><img width="400px" src="kicker.jpg" alt="random" /></div>
-    <!-- perhaps I can find a sihlouette image of a martial artist throwingakick andadd that next to my header -->
+    <!-- this picture has the checkerboard background that normally means it has no background, however when live, the pattern still shows. find a way to fix. -->
 
     <nav>
         <menu>
@@ -22,7 +22,17 @@
     </nav>
 </header>
 
+<main>
+    <div></div>
+    <p>The Tournevent Tracker is designed to provide athletes with timely and relevant updates when at a competition.
+        It provides to the competitor a list of individual events that the competitor expects to participate in, along
+        with constant updates to inform the athlete that their round or match will be starting soon and where exactly
+        they need to be;
+        extremely helpful for events with large venues. Tournevent also keeps track of the competitors performance and
+        will show them their scores or ranking.</p>
 
+
+</main>
 
 
 

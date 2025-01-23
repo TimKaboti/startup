@@ -8,8 +8,7 @@
 <header>
     <h1>Tournevent</h1>
     <div id="picture" class="picture-box"><img width="400px" src="kicker.jpg" alt="random" /></div>
-    <!-- perhaps I can find a sihlouette image of a martial artist throwingakick andadd that next to my header -->
-
+    <!-- this picture has the checkerboard background that normally means it has no background, however when live, the pattern still shows. find a way to fix. -->
     <nav>
         <menu>
             <li><a href="index.html">Login</a></li>
@@ -22,7 +21,12 @@
     </nav>
 </header>
 
+<main>
+    <div></div>
 
+
+
+</main>
 
 
 
