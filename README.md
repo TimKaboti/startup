@@ -72,8 +72,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
 - [x] **Images** - there is an image named kicker.jpg used as part of the logo
 - [x] **Login placeholder** - there is a login placeholder
-- [ ] **DB data placeholder** - I did not complete this part of the deliverable.
-- [ ] **WebSocket placeholder** - I did not complete this part of the deliverable.
+- [x] **DB data placeholder** - there is a spot on the competitor page where information that would be stored in the database is shown to the competitor  
+- [x] **WebSocket placeholder** - there is a place on the competitor screen where a webscket message would appear to alert the competitor of changes.
 
 ## 🚀 CSS deliverable
 
