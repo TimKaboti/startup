@@ -66,10 +66,10 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] **HTML pages** - created 5 new html pages inlcuding an index page.
-- [ ] **Proper HTML element usage** - I did not complete this part of the deliverable.
+- [x] **Proper HTML element usage** - I believe I used proper html elements in an effetive manner.
 - [x] **Links** - each page has links to each other. some have specifc page links for specific actions ike pdhing a specific button
 - [x] **Text** - there is text and headers.
-- [ ] **3rd party API placeholder** - I did not complete this part of the deliverable.
+- [x] **3rd party API placeholder** - placeholder for an inspirational quote api.
 - [x] **Images** - there is an image named kicker.jpg used as part of the logo
 - [x] **Login placeholder** - there is a login placeholder
 - [x] **DB data placeholder** - there is a spot on the competitor page where information that would be stored in the database is shown to the competitor  
