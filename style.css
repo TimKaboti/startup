@@ -10,4 +10,87 @@ header {
     flex: 0 80px;
 }
 
-img {}
+img {
+    width: auto;
+    max-width: 20%;
+    height: auto;
+    max-height: 20%;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Navbar Styling */
+nav {
+    background: #333;
+    padding: 10px;
+    text-align: center;
+}
+
+.menu {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    position: relative;
+}
+
+.menu li {
+    position: relative;
+}
+
+.menu a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+}
+
+.menu a:hover {
+    background: #555;
+}
+
+/* Dropdown Styling */
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #444;
+    min-width: 150px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown li {
+    display: block;
+    width: 100%;
+}
+
+.dropdown a {
+    padding: 10px;
+    text-align: left;
+    display: block;
+}
+
+.dropdown a:hover {
+    background: #666;
+}
+
+.dropdown.show {
+    display: block;
+}
+
+/* Show dropdown on hover */
+.menu li:hover .dropdown {
+    display: block;
+}
+
+.menu-toggle {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
