@@ -1,8 +1,10 @@
-html {}
+html {
+    height: 100%;
+}
 
 body {
-    /* display: flex;
-    flex-direction: column; */
+    display: flex;
+    flex-direction: column;
     min-width: 375px;
 }
 

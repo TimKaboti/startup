@@ -1,19 +1,20 @@
-html,
-body {
-    height: 100%;
-    margin: 0;
-}
-
-.main {
+/* This ensures the main content is centered vertically and horizontally */
+.events-main {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
     flex-direction: column;
+    justify-content: center;
+    /* Centers the content vertically */
+    align-items: center;
+    /* Centers the content horizontally */
+    height: 100vh;
+    /* Full viewport height */
     text-align: center;
+    padding: 20px;
+    /* Adds some space around the content */
 }
 
-.main form {
+/* Ensure the form and its elements are centered and have consistent padding */
+.events-main form {
     margin: 20px 0;
     width: 100%;
     max-width: 400px;
@@ -21,31 +22,36 @@ body {
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
+    box-sizing: border-box;
+    /* This ensures padding and borders don't affect the width */
 }
 
-.main form input {
+/* Input and button elements inside the form */
+.events-main form input,
+.events-main form button {
     width: 100%;
     padding: 10px;
     margin: 10px 0;
     border-radius: 5px;
-    border: 1px solid #ccc;
+    box-sizing: border-box;
+    /* Ensures padding doesn't push the element out of alignment */
 }
 
-.main form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #333;
+/* Styling for the button */
+.events-main form button {
+    background-color: #5c58de;
     color: white;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
 }
 
-.main form button:hover {
+/* Hover effect for buttons */
+.events-main form button:hover {
     background-color: #555;
 }
 
-.main h2 {
+/* Header styling inside the main section */
+.events-main h2 {
     font-size: 24px;
     margin-bottom: 10px;
     color: #333;

@@ -1,4 +1,6 @@
-html {}
+html {
+    height: 100%;
+}
 
 .index-main {
     display: flex;
