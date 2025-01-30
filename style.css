@@ -7,29 +7,54 @@ body {
 }
 
 header {
-    flex: 0 80px;
+    display: flex;
+    align-items: center;
+    /* Vertically align title and button */
+    justify-content: space-between;
+    /* Align title and button to the left/right */
+    padding: 10px 20px;
+    background: #333;
+    color: white;
+    position: relative;
+    /* Make it a positioning context for absolute elements */
+    height: 80px;
+    /* Fixed header size */
 }
 
-img {
+/* Title and Button Alignment */
+.title-container {
+    display: flex;
+    align-items: center;
+    /* Align elements vertically */
+    justify-content: flex-start;
+    /* Keep title and image together */
+    gap: 20px;
+    /* Space between title and image */
+    width: auto;
+}
+
+/* Ensures image scales properly */
+.picture-box img {
+
     width: auto;
     max-width: 20%;
     height: auto;
     max-height: 20%;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 /* Navbar Styling */
 nav {
-    background: #333;
-    padding: 10px;
-    text-align: center;
+    position: absolute;
+    /* Removes nav from normal flow */
+    right: 20px;
+    /* Align to the right of the header */
+    top: 50%;
+    /* Vertically center the button */
+    transform: translateY(-50%);
+    /* Adjust for perfect centering */
 }
 
+/* Menu Styling */
 .menu {
     list-style: none;
     display: flex;
@@ -38,32 +63,24 @@ nav {
     position: relative;
 }
 
-.menu li {
-    position: relative;
-}
-
-.menu a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    display: block;
-}
-
-.menu a:hover {
-    background: #555;
-}
-
 /* Dropdown Styling */
 .dropdown {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: visibility 0s linear 0.3s, opacity 0.3s ease, transform 0.3s ease;
     position: absolute;
     top: 100%;
-    left: 0;
+    left: -100px;
     background: #444;
     min-width: 150px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    padding: 5px 0;
+    z-index: 1000;
 }
 
+/* Dropdown menu items */
 .dropdown li {
     display: block;
     width: 100%;
@@ -73,6 +90,8 @@ nav {
     padding: 10px;
     text-align: left;
     display: block;
+    color: white;
+    text-decoration: none;
 }
 
 .dropdown a:hover {
@@ -80,17 +99,25 @@ nav {
 }
 
 .dropdown.show {
-    display: block;
-}
-
-/* Show dropdown on hover */
-.menu li:hover .dropdown {
-    display: block;
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0s;
 }
 
 .menu-toggle {
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 3px;
-    padding-bottom: 3px;
+    background: #555;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+    z-index: 1001;
+    /* Ensure it stays above other elements */
+}
+
+/* Button hover effect */
+.menu-toggle:hover {
+    background: #777;
 }
