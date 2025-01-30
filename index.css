@@ -4,9 +4,58 @@ html {
 
 .index-main {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
     flex-direction: column;
+    justify-content: center;
+    /* Centers the content vertically */
+    align-items: center;
+    /* Centers the content horizontally */
+    height: 100vh;
+    /* Full viewport height */
     text-align: center;
+    padding: 20px;
+    /* Adds some space around the content */
+}
+
+/* Ensure the form and its elements are centered and have consistent padding */
+.index-main form {
+    margin: 20px 0;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+    /* This ensures padding and borders don't affect the width */
+}
+
+/* Input and button elements inside the form */
+.index-main form input,
+.index-main form button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-sizing: border-box;
+    /* Ensures padding doesn't push the element out of alignment */
+}
+
+/* Styling for the button */
+.index-main form button {
+    background-color: #5c58de;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Hover effect for buttons */
+.index-main form button:hover {
+    background-color: #555;
+}
+
+/* Header styling inside the main section */
+.index-main h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
 }
