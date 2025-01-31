@@ -41,13 +41,23 @@
 
     <main>
         <p style="text-align: center;">You Can Do This! This is an inspirational quote.</p>
-        <h2>Your Information</h2>
-        <h3>Name:</h3>
-        <p>name</p>
-        <h3>Age:</h3>
-        <p>##</p>
-        <h3>Rank:</h3>
-        <p>**rank**</p>
+        <div class="dropdown-container">
+            <div class="dropdown-header">Your Information ▼</div>
+            <div class="dropdown-content">
+                <h3>Name:</h3>
+                <p>name</p>
+                <h3>Age:</h3>
+                <p>##</p>
+                <h3>Rank:</h3>
+                <p>**rank**</p>
+            </div>
+        </div>
+
+        <script>
+            document.querySelector(".dropdown-header").addEventListener("click", function () {
+                this.parentElement.classList.toggle("active");
+            });
+        </script>
         <!-- this is a placeholder for database content -->
 
         <div>

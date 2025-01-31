@@ -6,11 +6,8 @@ html {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* Centers the content vertically */
     align-items: center;
-    /* Centers the content horizontally */
     height: 100vh;
-    /* Full viewport height */
     text-align: center;
     padding: 20px;
     /* Adds some space around the content */
