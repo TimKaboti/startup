@@ -28,11 +28,7 @@
             </ul>
         </nav>
     </header>
-    <script>
-        document.querySelector(".menu-toggle").addEventListener("click", function () {
-            document.querySelector(".dropdown").classList.toggle("show");
-        });
-    </script>
+
 
     <main class="index-main">
         <h2>Login</h2>
@@ -52,6 +48,13 @@
         <h3>Ty Tanner</h3>
         <a href="https://github.com/TimKaboti/startup">GitHub</a>
     </footer>
+
+    <script>
+        document.querySelector(".menu-toggle").addEventListener("click", function (event) {
+            event.stopPropagation(); // Prevents other clicks from interfering
+            document.querySelector(".dropdown").classList.toggle("show");
+        });
+    </script>
 
 </body>
 

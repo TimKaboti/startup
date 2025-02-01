@@ -1,8 +1,26 @@
-html {
+/* Ensure the entire page takes up the full height */
+html,
+body {
     height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url('blue sides.jpg');
+    /* Replace with your image file */
+    background-size: cover;
+    /* Ensures the image covers the entire viewport */
+    background-position: center;
+    /* Centers the image */
+    background-attachment: fixed;
+    /* Keeps the image in place when scrolling */
+    background-repeat: no-repeat;
+    /* Prevents tiling */
 }
 
+/* Ensures the main content floats above the background */
 .index-main {
+    position: relative;
+    z-index: 1;
+    /* Keeps it above the background */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -10,10 +28,13 @@ html {
     height: 100vh;
     text-align: center;
     padding: 20px;
-    /* Adds some space around the content */
+    /* background: rgba(255, 255, 255, 0.25); */
+    /* Optional: Add transparency for readability */
+    border-radius: 10px;
+    /* Optional: Slightly rounded corners */
 }
 
-/* Ensure the form and its elements are centered and have consistent padding */
+/* Ensure form and its elements remain centered */
 .index-main form {
     margin: 20px 0;
     width: 100%;
@@ -21,12 +42,12 @@ html {
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: rgba(249, 249, 249, 0.9);
+    /* Make form slightly transparent */
     box-sizing: border-box;
-    /* This ensures padding and borders don't affect the width */
 }
 
-/* Input and button elements inside the form */
+/* Input and button styling */
 .index-main form input,
 .index-main form button {
     width: 100%;
@@ -34,10 +55,9 @@ html {
     margin: 10px 0;
     border-radius: 5px;
     box-sizing: border-box;
-    /* Ensures padding doesn't push the element out of alignment */
 }
 
-/* Styling for the button */
+/* Button styling */
 .index-main form button {
     background-color: #5c58de;
     color: white;
@@ -45,7 +65,7 @@ html {
     cursor: pointer;
 }
 
-/* Hover effect for buttons */
+/* Button hover effect */
 .index-main form button:hover {
     background-color: #555;
 }
@@ -55,4 +75,21 @@ html {
     font-size: 24px;
     margin-bottom: 10px;
     color: #333;
+}
+
+.footer {
+    position: relative;
+    /* Ensures it stays above the background */
+    z-index: 2;
+    /* Places it above the background */
+    width: 100%;
+    /* Full width */
+    background-color: white;
+    /* White background */
+    text-align: center;
+    /* Center the text */
+    padding: 15px 0;
+    /* Adjust padding for better spacing */
+    border-top: 1px solid #ddd;
+    /* Optional: Adds a subtle border at the top */
 }
