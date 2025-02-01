@@ -3,6 +3,12 @@
     src: url(fonts/RacingSansOne-Regular.ttf);
 }
 
+@font-face {
+    font-family: ContrailOne-Regular;
+    src: url(fonts/ContrailOne-Regular.ttf);
+}
+
+
 html,
 body {
     height: 100%;
@@ -142,6 +148,7 @@ main {
 }
 
 footer {
+    font-family: ContrailOne-Regular;
     position: relative;
     z-index: 10;
     /* Ensure it stays above the background */
