@@ -1,3 +1,8 @@
+@font-face {
+    font-family: Exo;
+    src: url(fonts/Exo-Italic-VariableFont_wght.ttf);
+}
+
 .about-main {
     display: flex;
     flex-direction: column;
@@ -6,4 +11,12 @@
     height: 100vh;
     text-align: center;
     padding: 20px;
+
+}
+
+.about-main div {
+    font-family: Exo;
+    background-color: #ffffff;
+    padding: 5px;
+    box-shadow: 7px 7px 7px rgba(1, 1, 1, .3);
 }

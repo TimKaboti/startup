@@ -28,27 +28,21 @@ body {
 header {
     display: flex;
     align-items: center;
-    /* Vertically align title and button */
     justify-content: space-between;
-    /* Align title and button to the left/right */
     padding: 10px 20px;
     background: white;
     color: black;
     position: relative;
-    /* Make it a positioning context for absolute elements */
     height: 80px;
-    /* Fixed header size */
+    box-shadow: 5px 7px 7px rgba(1, 1, 1, .3);
 }
 
 /* Title and Button Alignment */
 .title-container {
     display: flex;
     align-items: center;
-    /* Align elements vertically */
     justify-content: flex-start;
-    /* Keep title and image together */
     gap: 20px;
-    /* Space between title and image */
     width: auto;
     font-family: 'Racing_Sans_One';
 }
@@ -159,6 +153,6 @@ footer {
     padding: 15px 0;
     border-top: 1px solid #ddd;
     /* Optional border for separation */
-    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.3);
     /* Adds shadow */
 }

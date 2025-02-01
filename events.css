@@ -23,6 +23,7 @@
     border-radius: 8px;
     background-color: #f9f9f9;
     box-sizing: border-box;
+    box-shadow: 7px 7px 7px rgba(1, 1, 1, .3);
     /* This ensures padding and borders don't affect the width */
 }
 
