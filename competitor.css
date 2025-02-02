@@ -1,26 +1,3 @@
-/* Full-page centering */
-body,
-html {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-color: #f4f4f4;
-    font-family: Arial, sans-serif;
-    z-index: 5;
-}
-
-header {
-    display: flex;
-    width: 100%;
-    background: white;
-    height: 80px;
-    padding: 10px;
-}
-
 .title-container {
     display: flex;
     align-items: center;
@@ -47,7 +24,6 @@ header {
 
 }
 
-/* info Header */
 .info-header {
     background-color: #444;
     color: white;
@@ -61,7 +37,6 @@ header {
     background-color: #555;
 }
 
-/* info Content - Initially Hidden */
 .info-content {
     max-height: 0;
     overflow: hidden;
@@ -72,10 +47,8 @@ header {
 
 }
 
-/* Show content when active */
 .info-container.active .info-content {
     max-height: 300px;
-    /* Enough to fit content */
     opacity: 1;
     padding: 15px;
 }
@@ -86,6 +59,7 @@ header {
     margin: 5px;
 }
 
+
 .Events {
     background-color: white;
     padding: 20px;
@@ -95,7 +69,6 @@ header {
 
 fieldset {
     position: relative;
-    /* Ensures positioning context for the legend */
     padding: 20px;
     border: 2px solid #ccc;
     z-index: 1;
@@ -106,11 +79,8 @@ legend {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    /* This centers the legend horizontally */
     background-color: white;
-    /* Optional: Adds a background to prevent overlap */
     padding: 0 10px;
-    /* Optional: Adjusts padding for a cleaner look */
     font-size: 16px;
 }
 
@@ -124,33 +94,4 @@ legend {
 
 footer {
     margin-top: 20px;
-}
-
-/* For the competitor page only */
-.competitor-page body,
-.competitor-page html {
-    margin: 0;
-    padding: 0;
-    display: block;
-    /* Reverts flex layout for normal block layout */
-    background-color: #f4f4f4;
-    font-family: Arial, sans-serif;
-}
-
-/* Header styles */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    background: white;
-    height: 80px;
-    padding: 10px 20px;
-}
-
-/* For the title-container and other header elements */
-.title-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
 }
