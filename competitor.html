@@ -11,7 +11,7 @@
 
 </head>
 
-<body>
+<body class="competitor-page">
 
     <header>
         <div class="title-container">
@@ -41,9 +41,9 @@
 
     <main>
         <p class="quote">You Can Do This! This is an inspirational quote.</p>
-        <div class="dropdown-container">
-            <div class="dropdown-header">Your Information ▼</div>
-            <div class="dropdown-content">
+        <div class="info-container">
+            <div class="info-header">Your Information ▼</div>
+            <div class="info-content">
                 <h3>Name:</h3>
                 <p>name</p>
                 <h3>Age:</h3>
@@ -54,7 +54,7 @@
         </div>
 
         <script>
-            document.querySelector(".dropdown-header").addEventListener("click", function () {
+            document.querySelector(".info-header").addEventListener("click", function () {
                 this.parentElement.classList.toggle("active");
             });
         </script>
