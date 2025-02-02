@@ -18,5 +18,6 @@
     font-family: Exo;
     background-color: #ffffff;
     padding: 5px;
+    border-radius: 3px;
     box-shadow: 7px 7px 7px rgba(1, 1, 1, .3);
 }
