@@ -8,6 +8,17 @@
     src: url(fonts/ContrailOne-Regular.ttf);
 }
 
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url('blue sides.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
 
 /* This ensures the main content is centered vertically and horizontally */
 .events-main {

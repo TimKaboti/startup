@@ -4,6 +4,19 @@
 }
 
 
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url('blue sides.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+
 .main_info {
     background-color: rgb(224, 224, 224);
     margin: 20px;

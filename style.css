@@ -27,6 +27,9 @@ body {
     body {
         background-size: cover;
         background-position: top center;
+        background-size: contain;
+        /* Ensures the entire image is visible */
+
     }
 }
 
@@ -35,6 +38,7 @@ body {
         background-size: contain;
         /* Or use 'auto' for natural size */
         background-position: center;
+
     }
 }
 
