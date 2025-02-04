@@ -20,6 +20,10 @@
             background-color: #4CAF50;
             color: white;
         }
+
+        .competitor-input {
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -47,47 +51,66 @@
         const storedRings = JSON.parse(localStorage.getItem('rings')) || [];
         const ringsContainer = document.getElementById('rings-container');
         const addRingBtn = document.getElementById('add-ring-btn');
+        const competitorsTable = document.getElementById('competitors-table')?.querySelector('tbody') || null;
+        const competitorInputField = document.getElementById('new-competitor-name');
+        let competitors = []; // Empty list of competitors to start with
 
-        console.log("Stored Rings on Page Load:", storedRings);
+        let selectedCompetitors = {};
 
+        // Function to create a new ring
         function createRing(ringId) {
             const ring = document.createElement('div');
             ring.classList.add('ring');
             ring.id = `ring-${ringId}`;
-            ring.style.display = 'block'; // 🔹 Force visibility when created
+            ring.style.display = 'block'; // Force visibility when created
             ring.innerHTML = `
-            <h3>Ring ${ringId}</h3>
-            <button onclick="addMatch(${ringId})">Add Match</button>
-            <button onclick="deleteRing(${ringId})">Delete Ring</button>
-            <div class="matches" id="matches-${ringId}">
-                <!-- Matches will go here -->
-            </div>
-        `;
+                <h3>Ring ${ringId}</h3>
+                <button onclick="addMatch(${ringId})">Add Match</button>
+                <button onclick="deleteRing(${ringId})">Delete Ring</button>
+                <div class="matches" id="matches-${ringId}">
+                    <!-- Matches will go here -->
+                </div>
+                <div class="competitor-input">
+                    <input type="text" id="new-competitor-name-${ringId}" placeholder="Enter competitor name" />
+                    <button onclick="addCompetitor(${ringId})">Add Competitor</button>
+                </div>
+                <table id="competitors-table-${ringId}">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Competitors will appear here after being added -->
+                    </tbody>
+                </table>
+            `;
 
             ring.addEventListener('click', () => {
                 selectRing(ringId);
             });
 
             ringsContainer.appendChild(ring);
-            selectRing(ringId); // 🔹 Ensure the new ring is selected
+            selectRing(ringId); // Ensure the new ring is selected
         }
 
-
+        // Function to select the ring
         function selectRing(ringId) {
             const allRings = document.querySelectorAll('.ring');
 
             allRings.forEach(ring => {
-                ring.classList.remove('selected'); // Remove selection class
+                ring.classList.remove('selected');
             });
 
             const selectedRing = document.getElementById(`ring-${ringId}`);
             if (selectedRing) {
                 selectedRing.classList.add('selected');
-                selectedRing.style.display = 'block'; // 🔹 Ensure it remains visible
+                selectedRing.style.display = 'block'; // Ensure it remains visible
             }
         }
 
-
+        // Function to update localStorage with the current state of rings
         function updateRings() {
             const rings = [];
             document.querySelectorAll('.ring').forEach(ring => {
@@ -99,6 +122,7 @@
             console.log("Updated Rings in Local Storage:", JSON.parse(localStorage.getItem('rings')));
         }
 
+        // Function to add a match to a specific ring
         function addMatch(ringId) {
             console.log(`Adding match to Ring ${ringId}`);
             const matchesContainer = document.getElementById(`matches-${ringId}`);
@@ -106,19 +130,67 @@
                 console.error(`Matches container for Ring ${ringId} not found!`);
                 return;
             }
+
             const matchCount = matchesContainer.querySelectorAll('.match').length + 1;
             const match = document.createElement('div');
             match.classList.add('match');
             match.innerHTML = `
                 <p>Match ${matchCount}</p>
+                <label for="competitor1-${ringId}-${matchCount}">Competitor 1:</label>
+                <select id="competitor1-${ringId}-${matchCount}">
+                    <option value="">Select Competitor</option>
+                    ${generateCompetitorOptions(ringId)}
+                </select>
+                <label for="competitor2-${ringId}-${matchCount}">Competitor 2:</label>
+                <select id="competitor2-${ringId}-${matchCount}">
+                    <option value="">Select Competitor</option>
+                    ${generateCompetitorOptions(ringId)}
+                </select>
                 <button onclick="deleteMatch(${ringId}, ${matchCount})">Delete Match</button>
             `;
             matchesContainer.appendChild(match);
+
+            // Event listeners to handle competitor selection
+            match.querySelector(`#competitor1-${ringId}-${matchCount}`).addEventListener('change', (e) => {
+                handleCompetitorSelection(ringId, matchCount, e.target.value, 1);
+            });
+            match.querySelector(`#competitor2-${ringId}-${matchCount}`).addEventListener('change', (e) => {
+                handleCompetitorSelection(ringId, matchCount, e.target.value, 2);
+            });
         }
 
+        // Function to generate competitor options from the competitors list
+        function generateCompetitorOptions(ringId) {
+            const competitorOptions = competitors.map(competitor => {
+                return `<option value="${competitor.id}">${competitor.name}</option>`;
+            }).join('');
+            return competitorOptions;
+        }
+
+        // Function to handle the competitor selection for a match
+        function handleCompetitorSelection(ringId, matchId, competitorId, competitorNumber) {
+            if (!selectedCompetitors[ringId]) {
+                selectedCompetitors[ringId] = {};
+            }
+            if (!selectedCompetitors[ringId][matchId]) {
+                selectedCompetitors[ringId][matchId] = {};
+            }
+            selectedCompetitors[ringId][matchId][competitorNumber] = competitorId;
+            console.log(selectedCompetitors); // For debugging
+        }
+
+        // Function to delete a match
+        function deleteMatch(ringId, matchCount) {
+            const match = document.querySelector(`#ring-${ringId} .match:nth-child(${matchCount})`);
+            if (match) {
+                match.remove();
+                updateRings(); // Update localStorage after deletion
+            }
+        }
+
+        // Function to delete a ring
         function deleteRing(ringId) {
             if (confirm("Are you sure you want to delete this ring?")) {
-                console.log(`Deleting Ring ${ringId}`);
                 const ring = document.getElementById(`ring-${ringId}`);
                 if (ring) {
                     ring.remove();
@@ -129,6 +201,40 @@
             }
         }
 
+        // Function to add a new competitor to the list
+        function addCompetitor(ringId) {
+            const competitorName = document.getElementById(`new-competitor-name-${ringId}`).value.trim();
+            if (competitorName === "") {
+                alert("Please enter a valid competitor name.");
+                return;
+            }
+
+            const newCompetitor = {
+                id: competitors.length + 1,
+                name: competitorName
+            };
+
+            competitors.push(newCompetitor);
+
+            // Add competitor to the table within the ring
+            const competitorsTable = document.getElementById(`competitors-table-${ringId}`).querySelector('tbody');
+            const row = competitorsTable.insertRow();
+            row.insertCell(0).textContent = newCompetitor.name;
+            const actionCell = row.insertCell(1);
+            const selectBtn = document.createElement("button");
+            selectBtn.textContent = "Select";
+            selectBtn.onclick = () => selectCompetitor(newCompetitor.id);
+            actionCell.appendChild(selectBtn);
+
+            document.getElementById(`new-competitor-name-${ringId}`).value = ""; // Clear input field
+        }
+
+        // Function to handle competitor selection
+        function selectCompetitor(competitorId) {
+            console.log(`Competitor ${competitorId} selected.`);
+        }
+
+        // Load stored rings when the page loads
         storedRings.forEach(ring => {
             createRing(ring.id);
         });
@@ -136,13 +242,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (storedRings.length > 0) {
                 storedRings.forEach(ring => {
-                    document.getElementById(`ring-${ring.id}`).style.display = 'block'; // 🔹 Ensure visibility
+                    document.getElementById(`ring-${ring.id}`).style.display = 'block'; // Ensure visibility
                 });
-                selectRing(storedRings[0].id); // 🔹 Select first ring
+                selectRing(storedRings[0].id); // Select first ring
             }
         });
 
-
+        // Event listener to add a new ring
         addRingBtn.addEventListener('click', () => {
             console.log("Add Ring button clicked!");
             let nextRingId = 1;
