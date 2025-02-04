@@ -16,13 +16,34 @@ body {
     padding: 0;
     display: flex;
     flex-direction: column;
-    /* Makes sure footer is pushed to the bottom */
     background-image: url('blue sides.jpg');
-    /* Replace with your image */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
+}
+
+@media (max-width: 1024px) {
+    body {
+        background-size: cover;
+        background-position: top center;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        background-size: contain;
+        /* Or use 'auto' for natural size */
+        background-position: center;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 480px) {
+    body {
+        background-size: auto;
+        background-position: center;
+    }
 }
 
 header {
@@ -59,13 +80,9 @@ header {
 /* Navbar Styling */
 nav {
     position: absolute;
-    /* Removes nav from normal flow */
     right: 20px;
-    /* Align to the right of the header */
     top: 50%;
-    /* Vertically center the button */
     transform: translateY(-50%);
-    /* Adjust for perfect centering */
     z-index: 1000;
 
 }
