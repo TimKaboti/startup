@@ -89,7 +89,7 @@
 .Events table {
     border-radius: 3px;
     border-collapse: collapse;
-    margin: 3px;
+    margin: 5px;
 }
 
 .Events table td,
@@ -119,6 +119,7 @@ fieldset {
 fieldset p {
     text-align: center;
     background-color: white;
+    padding: 5px;
 }
 
 .Events td {
@@ -171,10 +172,14 @@ fieldset legend {
     font-size: 16px;
 }
 
+.notices p {
+    background-color: yellow;
+    padding: 1px;
+    margin-top: 2px;
+}
+
 .Events_legend {
     border: 2px solid blue;
-
-
 }
 
 footer {
