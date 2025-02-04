@@ -1,43 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
+this is a bit of code designed to help rings persist despite page refreshing
+this might not get used, but its here just in case.
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Names with Checkboxes</title>
-</head>
+// Initialize or get the ring number from localStorage
+let ringNumber = localStorage.getItem('ringNumber') ? parseInt(localStorage.getItem('ringNumber')) : 1;
 
-<body>
-    <fieldset>
-        <legend>Choose Participants</legend>
-        <table>
-            <thead>
-                <tr>
-                    <th style="text-align: left;">Name</th>
-                    <th style="text-align: left;">Select</th>
-                    <th style="text-align: right;"> <button oncklick="alert('editing')">Edit Match</button></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>John Doe</td>
-                    <td><input type="checkbox" name="selectJohn"></td>
-                </tr>
-                <tr>
-                    <td>Jane Smith</td>
-                    <td><input type="checkbox" name="selectJane"></td>
-                </tr>
-                <tr>
-                    <td>Emily Davis</td>
-                    <td><input type="checkbox" name="selectEmily"></td>
-                </tr>
-                <tr>
-                    <td>Michael Brown</td>
-                    <td><input type="checkbox" name="selectMichael"></td>
-                </tr>
-            </tbody>
-        </table>
-    </fieldset>
-</body>
+// Load the stored rings from localStorage if any
+const ringsContainer = document.querySelector('.rings-container');
+const storedRings = JSON.parse(localStorage.getItem('rings')) || [];
 
-</html>
+// Function to create a new ring
+function createRing(ringNum) {
+// Create new ring button
+const newRingButton = document.createElement('button');
+newRingButton.classList.add('ring-button');
+newRingButton.textContent = 'Ring ' + ringNum;
+
+// Create new dropdown container for each ring button
+const dropdown = document.createElement('div');
+dropdown.classList.add('dropdown-container');
+dropdown.style.display = 'none';
+dropdown.innerHTML = document.getElementById('dropdownTemplate').innerHTML;
+
+// Toggle dropdown visibility on button click
+newRingButton.addEventListener('click', function () {
+const isVisible = dropdown.style.display === 'block';
+dropdown.style.display = isVisible ? 'none' : 'block';
+});
+
+// Append the new ring button and its corresponding dropdown
+ringsContainer.appendChild(newRingButton);
+ringsContainer.appendChild(dropdown);
+}
+
+// Create the rings from localStorage data
+storedRings.forEach(ring => {
+createRing(ring);
+});
+
+// Handle adding new rings (buttons with dropdown)
+document.getElementById('addRingBtn').addEventListener('click', function () {
+// Store the new ring in localStorage
+const rings = JSON.parse(localStorage.getItem('rings')) || [];
+rings.push(ringNumber);
+localStorage.setItem('rings', JSON.stringify(rings));
+
+// Store the updated ring number in localStorage
+localStorage.setItem('ringNumber', ringNumber);
+
+// Create the new ring button
+createRing(ringNumber);
+
+// Increment the ring number for the next ring
+ringNumber++;
+});

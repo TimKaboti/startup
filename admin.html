@@ -3,13 +3,24 @@
 
 <head>
     <meta charset="UTF-8" />
-    <!-- Tell browsers not to scale the viewport automatically -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tournevent HTML</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="admin.css">
+    <style>
+        .ring {
+            display: none;
+        }
 
+        .ring.selected {
+            display: block;
+        }
 
+        .ring.selected h3 {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
@@ -20,81 +31,140 @@
                 <img width="150px" src="kicker.png" alt="random" />
             </div>
         </div>
-        <nav>
-            <button class="menu-toggle">☰</button>
-            <ul class="dropdown">
-                <li><a href="index.html">Login</a></li>
-                <li><a href="events.html">Events</a></li>
-                <li><a href="admin.html">Admin screen</a></li>
-                <li><a href="competitor.html">Competitor screen</a></li>
-                <li><a href="about.html">About</a></li>
-            </ul>
-        </nav>
     </header>
-    <script>
-        document.querySelector(".menu-toggle").addEventListener("click", function () {
-            document.querySelector(".dropdown").classList.toggle("show");
-        });
-    </script>
-
 
     <main>
         <div class="main_info">
             <h2>RINGS</h2>
-            <Fieldset style="margin: 5px;">
-                <table border=".05" width="100%" align="center">
-                    <tr>
-                        <td style="background-color: lightblue;">Ring 1 ⌄</td>
-                        <td>Ring 2 ⌄</td>
-                        <td>Ring 3 ⌄</td>
-                    </tr>
-                </table>
-
-            </Fieldset class="rings">
-            <h3 align="center">RING 1</h3>
-            <fieldset style="margin: 5px;">
-                <h3>Matches:</h3>
-                <p>Match 1 ⌄</p>
-                <p>Match 2 ⌄</p>
-                <p>Match 3 ⌄</p>
-                <p style="background-color: lightblue;">Match 4 ⌄</p>
-                <fieldset>
-                    <legend>Competitors</legend>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="text-align: left;">Competitor</th>
-                                <th style="text-align: left;"> Match Winner</th>
-                                <th style="text-align: left;"> <button oncklick="alert('editing')">Edit Match</button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Billy Kicker</td>
-                                <td><input type="checkbox" name="selectCompetitor" checked></td>
-                            </tr>
-                            <tr>
-                                <td>Joe Fists</td>
-                                <td><input type="checkbox" name="selectCompetitor"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </fieldset>
-                <p>Match 5 ⌄</p>
-                <p>Match 6 ⌄</p>
-            </fieldset>
-
+            <div id="rings-container"></div> <!-- Div for dynamic rings -->
+            <button id="add-ring-btn">Add Ring</button>
         </div>
-
-
-
     </main>
 
-    <footer>
+    <footer></footer>
 
-    </footer>
+    <script>
+        const storedRings = JSON.parse(localStorage.getItem('rings')) || [];
+        const ringsContainer = document.getElementById('rings-container');
+        const addRingBtn = document.getElementById('add-ring-btn');
 
+        console.log("Stored Rings on Page Load:", storedRings);
+
+        function createRing(ringId) {
+            const ring = document.createElement('div');
+            ring.classList.add('ring');
+            ring.id = `ring-${ringId}`;
+            ring.style.display = 'block'; // 🔹 Force visibility when created
+            ring.innerHTML = `
+            <h3>Ring ${ringId}</h3>
+            <button onclick="addMatch(${ringId})">Add Match</button>
+            <button onclick="deleteRing(${ringId})">Delete Ring</button>
+            <div class="matches" id="matches-${ringId}">
+                <!-- Matches will go here -->
+            </div>
+        `;
+
+            ring.addEventListener('click', () => {
+                selectRing(ringId);
+            });
+
+            ringsContainer.appendChild(ring);
+            selectRing(ringId); // 🔹 Ensure the new ring is selected
+        }
+
+
+        function selectRing(ringId) {
+            const allRings = document.querySelectorAll('.ring');
+
+            allRings.forEach(ring => {
+                ring.classList.remove('selected'); // Remove selection class
+            });
+
+            const selectedRing = document.getElementById(`ring-${ringId}`);
+            if (selectedRing) {
+                selectedRing.classList.add('selected');
+                selectedRing.style.display = 'block'; // 🔹 Ensure it remains visible
+            }
+        }
+
+
+        function updateRings() {
+            const rings = [];
+            document.querySelectorAll('.ring').forEach(ring => {
+                const ringId = ring.id.split('-')[1];
+                rings.push({ id: ringId, matches: [] });
+            });
+
+            localStorage.setItem('rings', JSON.stringify(rings));
+            console.log("Updated Rings in Local Storage:", JSON.parse(localStorage.getItem('rings')));
+        }
+
+        function addMatch(ringId) {
+            console.log(`Adding match to Ring ${ringId}`);
+            const matchesContainer = document.getElementById(`matches-${ringId}`);
+            if (!matchesContainer) {
+                console.error(`Matches container for Ring ${ringId} not found!`);
+                return;
+            }
+            const matchCount = matchesContainer.querySelectorAll('.match').length + 1;
+            const match = document.createElement('div');
+            match.classList.add('match');
+            match.innerHTML = `
+                <p>Match ${matchCount}</p>
+                <button onclick="deleteMatch(${ringId}, ${matchCount})">Delete Match</button>
+            `;
+            matchesContainer.appendChild(match);
+        }
+
+        function deleteRing(ringId) {
+            if (confirm("Are you sure you want to delete this ring?")) {
+                console.log(`Deleting Ring ${ringId}`);
+                const ring = document.getElementById(`ring-${ringId}`);
+                if (ring) {
+                    ring.remove();
+                    updateRings();
+                } else {
+                    console.error(`Ring ${ringId} not found for deletion!`);
+                }
+            }
+        }
+
+        storedRings.forEach(ring => {
+            createRing(ring.id);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (storedRings.length > 0) {
+                storedRings.forEach(ring => {
+                    document.getElementById(`ring-${ring.id}`).style.display = 'block'; // 🔹 Ensure visibility
+                });
+                selectRing(storedRings[0].id); // 🔹 Select first ring
+            }
+        });
+
+
+        addRingBtn.addEventListener('click', () => {
+            console.log("Add Ring button clicked!");
+            let nextRingId = 1;
+            const existingRingIds = storedRings.map(ring => ring.id);
+            const deletedRingIds = storedRings.filter(ring => ring.deleted).map(ring => ring.id);
+
+            if (deletedRingIds.length > 0) {
+                nextRingId = Math.min(...deletedRingIds);
+                const ringIndex = storedRings.findIndex(ring => ring.id === nextRingId.toString());
+                storedRings[ringIndex].deleted = false;
+            } else {
+                while (existingRingIds.includes(nextRingId.toString())) {
+                    nextRingId++;
+                }
+            }
+
+            console.log(`New Ring ID: ${nextRingId}`);
+            storedRings.push({ id: nextRingId.toString(), matches: [], deleted: false });
+            createRing(nextRingId);
+            updateRings();
+        });
+    </script>
 </body>
 
 </html>
