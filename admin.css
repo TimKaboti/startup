@@ -5,10 +5,18 @@
 
 
 .main_info {
-    background-color: white;
+    background-color: rgb(224, 224, 224);
     margin: 20px;
     box-shadow: 7px 7px 7px rgba(1, 1, 1, .3);
     border-radius: 3px;
     font-family: Exo;
 
+}
+
+.main_info h2 {
+    text-align: center;
+}
+
+.rings {
+    background-color: rgb(186, 183, 183);
 }
