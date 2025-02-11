@@ -1,0 +1,118 @@
+@font-face {
+    font-family: Exo;
+    src: url(fonts/Exo-Italic-VariableFont_wght.ttf);
+}
+
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url('blue sides.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+
+.main_info {
+    background-color: rgb(224, 224, 224);
+    margin: 20px;
+    box-shadow: 7px 7px 7px rgba(1, 1, 1, .3);
+    border-radius: 3px;
+    font-family: Exo;
+    position: relative;
+    /* Makes the container the reference point for the absolute positioning */
+    padding: 20px;
+
+}
+
+
+#add-ring-btn {
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    z-index: 1;
+}
+
+
+.main_info h2 {
+    text-align: center;
+}
+
+.rings {
+    background-color: rgb(186, 183, 183);
+}
+
+/* Style for the buttons */
+.ring-button {
+    margin: 5px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: lightblue;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Style for the dropdown */
+.dropdown-container {
+    margin-top: 5px;
+    padding: 10px;
+    background-color: lightgray;
+    border-radius: 5px;
+    display: none;
+}
+
+/* Make the dropdown more visible when displayed */
+.dropdown-container p {
+    font-size: 14px;
+}
+
+/* Container holding all rings */
+#rings-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allows rings to wrap to the next line if necessary */
+    gap: 20px;
+    /* Spacing between the rings */
+    margin-top: 20px;
+}
+
+/* Styling for each ring */
+.ring {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    width: 200px;
+    /* Set width for consistent ring size */
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: none;
+}
+
+/* Initially hide the contents of rings */
+.ring-content {
+    display: none;
+}
+
+/* Show the content when the ring is selected */
+.ring.active .ring-content {
+    display: block;
+}
+
+.ring.selected {
+    display: block;
+}
+
+/* Optionally, you can style the selected ring differently */
+.ring.selected h3 {
+    background-color: #4CAF50;
+    /* Green background for selected ring */
+    color: white;
+}

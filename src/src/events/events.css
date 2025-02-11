@@ -1,0 +1,81 @@
+@font-face {
+    font-family: Exo;
+    src: url(fonts/Exo-Italic-VariableFont_wght.ttf);
+}
+
+@font-face {
+    font-family: ContrailOne-Regular;
+    src: url(fonts/ContrailOne-Regular.ttf);
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url('blue sides.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/* This ensures the main content is centered vertically and horizontally */
+.events-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    font-family: Exo;
+
+}
+
+/* Ensure the form and its elements are centered and have consistent padding */
+.events-main form {
+    margin: 20px 0;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+    box-shadow: 7px 7px 7px rgba(1, 1, 1, .3);
+    font-family: Exo;
+
+}
+
+/* Input and button elements inside the form */
+.events-main form input,
+.events-main form button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-family: Exo;
+
+}
+
+/* Styling for the button */
+.events-main form button {
+    background-color: #5c58de;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Hover effect for buttons */
+.events-main form button:hover {
+    background-color: #555;
+}
+
+/* Header styling inside the main section */
+.events-main h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
