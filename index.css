@@ -1,0 +1,14 @@
+main {
+    text-align: center;
+    position: relative;
+}
+
+main.div {
+    background-color: white;
+    box-shadow: 5px 5px 5px (1, 1, 1, .3);
+}
+
+
+.welcome {
+    text-align: center;
+}
