@@ -51,6 +51,7 @@ export default function App() {
                 {/* Routes for different pages */}
                 <Routes>
                     <Route path="/" element={<Login />} />
+                    <Route path="/Login" element={<Login />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="/competitor" element={<Competitor />} />
                     <Route path="/events" element={<Events />} />
