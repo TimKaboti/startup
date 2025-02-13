@@ -23,13 +23,13 @@ body {
     background-repeat: no-repeat;
 }
 
-#root {
+/* #root {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     min-height: 100vh;
 
-}
+} */
 
 @media (max-width: 1024px) {
     body {
@@ -186,5 +186,5 @@ footer {
     /* Optional border for separation */
     box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.3);
     /* Adds shadow */
-    margin-top: auto;
+    /* margin-top: auto; */
 }
