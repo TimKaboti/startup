@@ -1,5 +1,6 @@
 // import React from 'react';
 import React, { useState } from 'react';
+import './competitor.css';
 
 export function Competitor() {
     // State for toggling the "Your Information" section

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './admin.css';
 
 export function Admin() {
     const [rings, setRings] = useState([]);
