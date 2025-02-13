@@ -16,7 +16,7 @@ body {
     padding: 0;
     display: flex;
     flex-direction: column;
-    background-image: url('blue sides.jpg');
+    background-image: url('/blue-sides.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
