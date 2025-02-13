@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './events.css';
 
 export function Events() {
     const navigate = useNavigate(); // Use React Router's navigation hook
