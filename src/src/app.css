@@ -1,11 +1,11 @@
 @font-face {
     font-family: Racing_Sans_One;
-    src: url(fonts/RacingSansOne-Regular.ttf);
+    src: url('./fonts/RacingSansOne-Regular.ttf');
 }
 
 @font-face {
     font-family: ContrailOne-Regular;
-    src: url(fonts/ContrailOne-Regular.ttf);
+    src: url('./fonts/ContrailOne-Regular.ttf');
 }
 
 

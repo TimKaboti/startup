@@ -1,4 +1,4 @@
-@font-face {
+/* @font-face {
     font-family: Exo;
     src: url(fonts/Exo-Italic-VariableFont_wght.ttf);
 }
@@ -24,7 +24,6 @@ body {
     border-radius: 3px;
     font-family: Exo;
     position: relative;
-    /* Makes the container the reference point for the absolute positioning */
     padding: 20px;
 
 }
@@ -46,7 +45,6 @@ body {
     background-color: rgb(186, 183, 183);
 }
 
-/* Style for the buttons */
 .ring-button {
     margin: 5px;
     padding: 10px;
@@ -57,7 +55,6 @@ body {
     cursor: pointer;
 }
 
-/* Style for the dropdown */
 .dropdown-container {
     margin-top: 5px;
     padding: 10px;
@@ -66,29 +63,23 @@ body {
     display: none;
 }
 
-/* Make the dropdown more visible when displayed */
 .dropdown-container p {
     font-size: 14px;
 }
 
-/* Container holding all rings */
 #rings-container {
     display: flex;
     flex-wrap: wrap;
-    /* Allows rings to wrap to the next line if necessary */
     gap: 20px;
-    /* Spacing between the rings */
     margin-top: 20px;
 }
 
-/* Styling for each ring */
 .ring {
     border: 2px solid #ccc;
     border-radius: 8px;
     padding: 10px;
     background-color: #f9f9f9;
     width: 200px;
-    /* Set width for consistent ring size */
     text-align: center;
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -96,12 +87,10 @@ body {
     display: none;
 }
 
-/* Initially hide the contents of rings */
 .ring-content {
     display: none;
 }
 
-/* Show the content when the ring is selected */
 .ring.active .ring-content {
     display: block;
 }
@@ -110,9 +99,7 @@ body {
     display: block;
 }
 
-/* Optionally, you can style the selected ring differently */
 .ring.selected h3 {
     background-color: #4CAF50;
-    /* Green background for selected ring */
     color: white;
-}
+} */

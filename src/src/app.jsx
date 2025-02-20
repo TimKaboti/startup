@@ -18,6 +18,7 @@ export default function App() {
         setMenuOpen(!menuOpen);
     };
 
+
     console.log("App component rendered!");
 
 
@@ -48,16 +49,30 @@ export default function App() {
                     </nav>
                 </header>
 
-                {/* Routes for different pages */}
-                <Routes>
-                    <Route path="/" element={<Login />} />
-                    <Route path="/Login" element={<Login />} />
-                    <Route path="/admin" element={<Admin />} />
-                    <Route path="/competitor" element={<Competitor />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
+                <div
+                    style={{
+                        backgroundImage: 'url(/blue-sides.jpg)', // Use absolute path
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat',
+                        minHeight: '100vh'
+                    }}>
+
+
+                    {/* Routes for different pages */}
+                    <Routes>
+                        <Route path="/" element={<Login />} />
+                        <Route path="/Login" element={<Login />} />
+                        <Route path="/admin" element={<Admin />} />
+                        <Route path="/competitor" element={<Competitor />} />
+                        <Route path="/events" element={<Events />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="*" element={<NotFound />} />
+                    </Routes>
+
+
+                </div>
+
 
                 {/* Footer Section */}
                 <footer>
