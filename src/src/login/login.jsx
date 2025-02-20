@@ -15,6 +15,8 @@ export function Login() {
         navigate('/events'); // Navigates to the events page
     };
 
+
+
     return (
         <main className="index-main">
             <h2>Login</h2>

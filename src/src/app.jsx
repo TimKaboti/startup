@@ -59,10 +59,6 @@ export default function App() {
                     <Route path="*" element={<NotFound />} />
                 </Routes>
 
-                {/* Main Content */}
-                <main className="index-main">
-                </main>
-
                 {/* Footer Section */}
                 <footer>
                     <h3>Ty Tanner</h3>

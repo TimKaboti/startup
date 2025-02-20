@@ -1,29 +1,35 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import './events.css';
 
 export function Events() {
-    const navigate = useNavigate(); // Use React Router's navigation hook
-
+    const navigate = useNavigate();
     const [eventCode, setEventCode] = useState('');
     const [eventName, setEventName] = useState('');
 
-    // Handle form submission for joining an event
     const handleJoinEvent = (e) => {
-        e.preventDefault(); // Prevent page reload
-        // Add logic here if needed for validation
-        navigate('/competitor', { state: { eventCode } }); // Redirect to competitor screen with event code
+        e.preventDefault();
+        navigate('/competitor', { state: { eventCode } });
     };
 
-    // Handle form submission for creating a new event
     const handleCreateEvent = (e) => {
-        e.preventDefault(); // Prevent page reload
-        // Add logic here if needed for validation
-        navigate('/admin', { state: { eventName } }); // Redirect to admin screen with event name
+        e.preventDefault();
+        navigate('/admin', { state: { eventName } });
     };
 
     return (
-        <main className="events-main">
+        <main
+            className="events-main"
+            style={{
+                backgroundImage: "url('/blue-sides.jpg')", // Reference from public folder
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed',
+                minHeight: '100vh'
+            }}
+        >
             <h2>Join Existing Event</h2>
             <form onSubmit={handleJoinEvent}>
                 <div>
@@ -31,7 +37,7 @@ export function Events() {
                         type="text"
                         placeholder="Event Code"
                         value={eventCode}
-                        onChange={(e) => setEventCode(e.target.value)} // Manage state of the input
+                        onChange={(e) => setEventCode(e.target.value)}
                     />
                 </div>
                 <button type="submit">Join</button>
@@ -44,7 +50,7 @@ export function Events() {
                         type="text"
                         placeholder="Event Name"
                         value={eventName}
-                        onChange={(e) => setEventName(e.target.value)} // Manage state of the input
+                        onChange={(e) => setEventName(e.target.value)}
                     />
                 </div>
                 <button type="submit">Create</button>
