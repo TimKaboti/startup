@@ -28,7 +28,7 @@ export default function App() {
                 {/* Header Section */}
                 <header>
                     <div className="title-container">
-                        <h1>Tournevent</h1>
+                        <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
                         <div id="picture" className="picture-box">
                             <img width="150px" src="kicker.png" alt="random" />
                         </div>
@@ -76,7 +76,7 @@ export default function App() {
 
                 {/* Footer Section */}
                 <footer>
-                    <h3>Ty Tanner</h3>
+                    <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
                     <a href="https://github.com/TimKaboti/startup">GitHub</a>
                 </footer>
             </div>
