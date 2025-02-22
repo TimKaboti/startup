@@ -4,7 +4,7 @@
 }
 
 
-html,
+/* html,
 body {
     height: 100%;
     margin: 0;
@@ -15,8 +15,7 @@ body {
     background-attachment: fixed;
     background-repeat: no-repeat;
     font-family: Exo;
-
-}
+} */
 
 .index-main {
     position: relative;
@@ -72,6 +71,8 @@ body {
 .index-main h2 {
     font-size: 24px;
     margin-bottom: 10px;
+    top: auto;
+    bottom: auto;
     color: #333;
 }
 
