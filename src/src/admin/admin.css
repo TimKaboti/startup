@@ -28,6 +28,17 @@ body {
 
 }
 
+*/
+
+h2 {
+    position: relative;
+    top: 40px;
+    margin-top: 0px;
+    margin-bottom: 48px;
+}
+
+/*
+
 
 #add-ring-btn {
     position: absolute;

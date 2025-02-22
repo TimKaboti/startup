@@ -22,6 +22,7 @@ export function Events() {
         <main
             className="events-main"
             style={{
+                fontFamily: 'Exo',
                 backgroundImage: "url('/blue-sides.jpg')", // Reference from public folder
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
@@ -29,6 +30,7 @@ export function Events() {
                 backgroundAttachment: 'fixed',
                 minHeight: '100vh'
             }}
+
         >
             <h2>Join Existing Event</h2>
             <form onSubmit={handleJoinEvent}>

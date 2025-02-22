@@ -1,14 +1,15 @@
 @font-face {
-    font-family: Exo;
-    src: url(fonts/Exo-Italic-VariableFont_wght.ttf);
+    font-family: 'Exo';
+    src: url('/fonts/Exo-Italic-VariableFont_wght.ttf') format('truetype');
 }
+
 
 @font-face {
-    font-family: ContrailOne-Regular;
-    src: url(fonts/ContrailOne-Regular.ttf);
+    font-family: 'ContrailOne';
+    src: url('/fonts/ContrailOne-Regular.ttf') format('truetype');
 }
 
-html,
+/* html,
 body {
     height: 100%;
     margin: 0;
@@ -18,9 +19,8 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-}
+} */
 
-/* This ensures the main content is centered vertically and horizontally */
 .events-main {
     display: flex;
     flex-direction: column;
@@ -33,7 +33,6 @@ body {
 
 }
 
-/* Ensure the form and its elements are centered and have consistent padding */
 .events-main form {
     margin: 20px 0;
     width: 100%;
@@ -48,7 +47,6 @@ body {
 
 }
 
-/* Input and button elements inside the form */
 .events-main form input,
 .events-main form button {
     width: 100%;
@@ -60,7 +58,6 @@ body {
 
 }
 
-/* Styling for the button */
 .events-main form button {
     background-color: #5c58de;
     color: white;
@@ -68,12 +65,10 @@ body {
     cursor: pointer;
 }
 
-/* Hover effect for buttons */
 .events-main form button:hover {
     background-color: #555;
 }
 
-/* Header styling inside the main section */
 .events-main h2 {
     font-size: 24px;
     margin-bottom: 10px;

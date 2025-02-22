@@ -12,16 +12,16 @@ export function Competitor() {
     };
 
     return (
-        <main>
+        <main style={{ fontFamily: 'Exo' }}>
             <p className="quote">You Can Do This! This is an inspirational quote.</p>
 
             {/* Info Section */}
             <div className={`info-container ${isInfoActive ? 'active' : ''}`}>
-                <div className="info-header" onClick={toggleInfo}>
+                <div className="info-header" onClick={toggleInfo} style={{ fontFamily: 'Exo' }}>
                     Your Information ▼
                 </div>
                 {isInfoActive && (
-                    <div className="info-content">
+                    <div className="info-content" style={{ fontFamily: 'Exo' }}>
                         <h3>Name:</h3>
                         <p>name</p>
                         <h3>Age:</h3>

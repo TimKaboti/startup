@@ -51,7 +51,7 @@ export function Admin() {
 
     return (
         <main>
-            <div className="main_info">
+            <div className="main_info" style={{ fontFamily: 'Exo' }}>
                 <h2>RINGS</h2>
                 <div id="rings-container">
                     {rings.map((ring) => (

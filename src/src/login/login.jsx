@@ -18,7 +18,7 @@ export function Login() {
 
 
     return (
-        <main className="index-main">
+        <main className="index-main" style={{ fontFamily: 'Exo' }}>
             <h2>Login</h2>
             <form onSubmit={handleSubmit}>
                 <div>

@@ -1,4 +1,4 @@
-@font-face {
+/* @font-face {
     font-family: Exo;
     src: url(fonts/Exo-Italic-VariableFont_wght.ttf);
 }
@@ -20,7 +20,7 @@ body {
     background-attachment: fixed;
 }
 
-
+*/
 .title-container {
     display: flex;
     align-items: center;
@@ -81,8 +81,9 @@ body {
 
 .quote {
     text-align: center;
-    padding: 5px;
+    padding: 10px;
     margin: 5px;
+    margin-top: 0px;
     font-family: Exo;
 
 }
@@ -126,6 +127,7 @@ fieldset {
     margin: 5px;
 
 }
+
 
 fieldset p {
     text-align: center;
@@ -193,6 +195,7 @@ fieldset legend {
     border: 2px solid blue;
 }
 
+/*
 footer {
     margin-top: 20px;
-}
+} */

@@ -8,6 +8,11 @@
     src: url('/fonts/ContrailOne-Regular.ttf') format('truetype');
 }
 
+@font-face {
+    font-family: 'Exo';
+    src: url('/fonts/Exo-Italic-VariableFont_wght.ttf') format('truetype');
+}
+
 
 
 html,
@@ -63,11 +68,13 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 5px 20px;
+    /* might need to change 5 back to 10. we'll see */
     background: white;
-    color: black;
+    /* color: black; */
     position: relative;
     height: 80px;
+    z-index: 9999;
     box-shadow: 5px 7px 7px rgba(1, 1, 1, .3);
 }
 
@@ -176,14 +183,14 @@ main {
 footer {
     font-family: ContrailOne-Regular;
     position: relative;
-    z-index: 10;
+    z-index: 9999;
     /* Ensure it stays above the background */
     width: 100%;
     background-color: white;
     /* White background to contrast the background image */
     text-align: center;
     padding: 15px 0;
-    border-top: 1px solid #ddd;
+    /* border-top: 1px solid #ddd; */
     /* Optional border for separation */
     box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.3);
     /* Adds shadow */

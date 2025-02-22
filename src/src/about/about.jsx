@@ -13,7 +13,7 @@ export function About() {
                 minHeight: '100vh'
             }}
         >
-            <div>
+            <div style={{ fontFamily: 'Exo' }}>
                 <p>
                     The Tournevent Tracker is designed to provide athletes with timely and relevant updates when at a
                     competition.
