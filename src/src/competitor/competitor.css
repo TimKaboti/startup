@@ -107,6 +107,7 @@ body {
 .Events table td,
 th {
     text-align: center;
+    border-color: blue;
 }
 
 

@@ -1,0 +1,22 @@
+{
+    "events": [
+        {
+            "name": "Sparring",
+            "ring": 3,
+            "match": 19,
+            "currentMatch": 14
+        },
+        {
+            "name": "Poomsae",
+            "ring": 2,
+            "match": 5,
+            "currentMatch": 3
+        },
+        {
+            "name": "Board Breaking",
+            "ring": 1,
+            "match": 12,
+            "currentMatch": 8
+        }
+    ]
+}
