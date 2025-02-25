@@ -10,8 +10,34 @@
 
 ## AWS Notes
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
 
 ## HTML Notes
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+
+## REACT Notes
+react hooks and what they do
+
+
+Hook	        Purpose
+useState	    Manage component state
+useEffect	    Handle side effects (API calls, DOM changes)
+useContext	    Use global state without prop drilling
+useRef	        Access DOM elements or persist values without re-renders
+
+useReducer	    Manage complex state logic like Redux
+useMemo	        Optimize expensive computations
+useCallback	    Optimize function references
+useLayoutEffect	Runs synchronously after DOM updates
+
+
+Use Case	                        Use This Hook
+Component needs state	            useState
+Side effects (fetching, timers)	    useEffect
+Global state management	            useContext
+Accessing a DOM element	            useRef
+Memoizing expensive calculations	useMemo
+Optimizing function references	    useCallback
+Complex state logic	                useReducer
+Reusing logic across components	    Create a custom hook

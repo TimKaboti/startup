@@ -1,12 +1,24 @@
-// import React from 'react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './competitor.css';
 
 export function Competitor() {
-    // State for toggling the "Your Information" section
     const [isInfoActive, setIsInfoActive] = useState(false);
+    const [competitor, setCompetitor] = useState({ name: '', age: '', rank: '' });
 
-    // Function to toggle visibility of "Your Information" section
+    useEffect(() => {
+        fetch('/competitor.json')
+            .then(response => {
+                console.log('Fetch Response:', response);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Fetched Data:', data);
+                setCompetitor(data);
+            })
+            .catch(error => console.error('Error fetching competitor data:', error));
+    }, []);
+
+
     const toggleInfo = () => {
         setIsInfoActive(!isInfoActive);
     };
@@ -22,12 +34,9 @@ export function Competitor() {
                 </div>
                 {isInfoActive && (
                     <div className="info-content" style={{ fontFamily: 'Exo' }}>
-                        <h3>Name:</h3>
-                        <p>name</p>
-                        <h3>Age:</h3>
-                        <p>##</p>
-                        <h3>Rank:</h3>
-                        <p>**rank**</p>
+                        <h3>Name: {competitor.name}</h3>
+                        <h3>Age: {competitor.age}</h3>
+                        <h3>Rank: {competitor.rank}</h3>
                     </div>
                 )}
             </div>

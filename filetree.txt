@@ -36,6 +36,7 @@ RacingSansOne-Regular.ttf
 
 
 ./public:
+competitor.json
 bluered.jpg
 blue-sides.jpg
 kicker.png
