@@ -6,9 +6,11 @@ export function Competitor() {
     const [competitor, setCompetitor] = useState({ name: '', age: '', rank: '' });
     const [events, setEvents] = useState([]);
     const [isInfoActive, setIsInfoActive] = useState(false); // State to control dropdown visibility
+    const [isRingManager, setIsRingManager] = useState(false); // State to check if the user is a ring manager
 
     const location = useLocation(); // Get location from React Router
     const eventName = location.state?.eventName; // Retrieve event name from state
+    const role = location.state?.role; // Retrieve user role from state
 
     useEffect(() => {
         // Fetch competitor info
@@ -20,9 +22,16 @@ export function Competitor() {
         // Fetch competitor's events
         fetch('/competitorEvents.json')
             .then(response => response.json())
-            .then(data => setEvents(data.events))
+            .then(data => {
+                setEvents(data.events);
+                // Check if the user is a ring manager for the event
+                const currentEvent = data.events.find(event => event.name === eventName);
+                if (currentEvent && currentEvent.role === 'ringManager') {
+                    setIsRingManager(true);
+                }
+            })
             .catch(error => console.error('Error fetching event data:', error));
-    }, []);
+    }, [eventName]);
 
     // Function to toggle visibility of "Your Information" section
     const toggleInfo = () => {
@@ -76,6 +85,11 @@ export function Competitor() {
                             <div className="scoring">
                                 Results: -------
                             </div>
+                            {isRingManager && (
+                                <button onClick={() => navigate('/admin', { state: { eventName: event.name } })}>
+                                    Go to Admin
+                                </button>
+                            )}
                         </fieldset>
                     ))
                 ) : (

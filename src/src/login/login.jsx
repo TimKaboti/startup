@@ -9,6 +9,7 @@ export function Login() {
     const [age, setAge] = useState('');
     const [rank, setRank] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+    const [role, setRole] = useState('competitor'); // State for role selection
     const navigate = useNavigate();
 
     const handleSubmit = (event) => {
@@ -17,7 +18,7 @@ export function Login() {
         const user = users.find((u) => u.email === email && u.password === password);
 
         if (user) {
-            localStorage.setItem('loggedInUser', JSON.stringify(user));
+            localStorage.setItem('loggedInUser', JSON.stringify({ ...user, role })); // Include role in user data
             navigate('/events');
         } else {
             alert('Invalid email or password');
@@ -25,7 +26,7 @@ export function Login() {
     };
 
     const handleCreateUser = () => {
-        if (!email || !password || !name || !age || !rank) {
+        if (!email || !password || !name || !age) { // Rank is excluded here
             alert('Please fill in all fields');
             return;
         }
@@ -36,7 +37,7 @@ export function Login() {
             return;
         }
 
-        const newUser = { email, password, name, age, rank };
+        const newUser = { email, password, name, age, rank }; // Keep rank in the new user object
         users.push(newUser);
         localStorage.setItem('users', JSON.stringify(users));
         alert('User created successfully! You can now log in.');
@@ -72,6 +73,26 @@ export function Login() {
                 <div>
                     <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
+                {!isCreating && ( // Role selection only during login
+                    <div>
+                        <label>
+                            <input
+                                type="radio"
+                                value="competitor"
+                                checked={role === 'competitor'}
+                                onChange={() => setRole('competitor')}
+                            /> Competitor
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                value="ringManager"
+                                checked={role === 'ringManager'}
+                                onChange={() => setRole('ringManager')}
+                            /> Ring Manager
+                        </label>
+                    </div>
+                )}
                 {isCreating ? (
                     <button type="button" onClick={handleCreateUser}>Create Account</button>
                 ) : (
