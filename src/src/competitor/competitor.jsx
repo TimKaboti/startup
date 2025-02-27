@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import './competitor.css';
 
 export function Competitor() {
@@ -6,15 +7,15 @@ export function Competitor() {
     const [events, setEvents] = useState([]);
     const [isInfoActive, setIsInfoActive] = useState(false); // State to control dropdown visibility
 
-    useEffect(() => {
-        // Load logged-in user info from localStorage
-        const storedUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const location = useLocation(); // Get location from React Router
+    const eventName = location.state?.eventName; // Retrieve event name from state
 
-        if (storedUser) {
-            setCompetitor(storedUser);
-        } else {
-            setCompetitor({ name: 'Guest', age: '-', rank: '-' });
-        }
+    useEffect(() => {
+        // Fetch competitor info
+        fetch('/competitor.json')
+            .then(response => response.json())
+            .then(data => setCompetitor(data))
+            .catch(error => console.error('Error fetching competitor data:', error));
 
         // Fetch competitor's events
         fetch('/competitorEvents.json')
@@ -31,6 +32,9 @@ export function Competitor() {
     return (
         <main style={{ fontFamily: 'Exo' }}>
             <p className="quote">You Can Do This! This is an inspirational quote.</p>
+
+            {/* Display the selected event name */}
+            {eventName && <h2>Joined Event: {eventName}</h2>}
 
             {/* Info Section with Toggle */}
             <div className={`info-container ${isInfoActive ? 'active' : ''}`}>
