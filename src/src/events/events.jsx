@@ -12,8 +12,8 @@ export function Events() {
     const existingEvents = JSON.parse(localStorage.getItem('events')) || [];
 
     useEffect(() => {
-        // Get logged in user data from local storage
-        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        // Get logged in user data from sessionStorage
+        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
         if (loggedInUser) {
             setRole(loggedInUser.role); // Set role from logged in user data
         }
@@ -25,7 +25,13 @@ export function Events() {
 
         const selectedEventData = existingEvents.find(event => event.id === Number(selectedEvent));
         if (selectedEventData) {
-            navigate(role === 'competitor' ? '/competitor' : '/admin', { state: { eventName: selectedEventData.name } });
+            if (role === 'competitor') {
+                // Navigate to competitor page with event details
+                navigate(`/event/${selectedEventData.id}`);
+            } else if (role === 'admin') {
+                // Navigate to admin page for the selected event
+                navigate(`/admin/${selectedEventData.id}`);
+            }
         }
     };
 
@@ -39,8 +45,8 @@ export function Events() {
         // Update local storage with the new event
         localStorage.setItem('events', JSON.stringify([...existingEvents, newEvent]));
 
-        // Navigate to admin page with event details
-        navigate('/admin', { state: { eventName } });
+        // Navigate to admin page with the new event details
+        navigate(`/admin/${newEvent.id}`);
 
         // Clear input field
         setEventName('');

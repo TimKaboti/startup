@@ -8,8 +8,8 @@ export function Login() {
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [rank, setRank] = useState('');
+    const [role, setRole] = useState('competitor');
     const [isCreating, setIsCreating] = useState(false);
-    const [role, setRole] = useState('competitor'); // State for role selection
     const navigate = useNavigate();
 
     const handleSubmit = (event) => {
@@ -18,15 +18,23 @@ export function Login() {
         const user = users.find((u) => u.email === email && u.password === password);
 
         if (user) {
-            localStorage.setItem('loggedInUser', JSON.stringify({ ...user, role })); // Include role in user data
-            navigate('/events');
+            // Store the logged-in user in sessionStorage with role
+            const loggedInUser = { ...user, role };
+            sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+
+            // Redirect based on role
+            if (role === 'admin') {
+                navigate('/events');  // Admin will be redirected to events first
+            } else {
+                navigate('/events');  // Competitor will also be redirected to events
+            }
         } else {
             alert('Invalid email or password');
         }
     };
 
     const handleCreateUser = () => {
-        if (!email || !password || !name || !age) { // Rank is excluded here
+        if (!email || !password || !name || !age || !rank) {
             alert('Please fill in all fields');
             return;
         }
@@ -37,7 +45,7 @@ export function Login() {
             return;
         }
 
-        const newUser = { email, password, name, age, rank }; // Keep rank in the new user object
+        const newUser = { email, password, name, age, rank };
         users.push(newUser);
         localStorage.setItem('users', JSON.stringify(users));
         alert('User created successfully! You can now log in.');
@@ -67,32 +75,36 @@ export function Login() {
                         </div>
                     </>
                 )}
-                <div>
-                    <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div>
-                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                {!isCreating && ( // Role selection only during login
-                    <div>
+
+                {!isCreating && (
+                    <div className="role-selection">
                         <label>
                             <input
                                 type="radio"
                                 value="competitor"
                                 checked={role === 'competitor'}
                                 onChange={() => setRole('competitor')}
-                            /> Competitor
+                            />
+                            Competitor
                         </label>
                         <label>
                             <input
                                 type="radio"
-                                value="ringManager"
-                                checked={role === 'ringManager'}
-                                onChange={() => setRole('ringManager')}
-                            /> Ring Manager
+                                value="admin"
+                                checked={role === 'admin'}
+                                onChange={() => setRole('admin')}
+                            />
+                            Admin
                         </label>
                     </div>
                 )}
+
+                <div>
+                    <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                </div>
+                <div>
+                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                </div>
                 {isCreating ? (
                     <button type="button" onClick={handleCreateUser}>Create Account</button>
                 ) : (

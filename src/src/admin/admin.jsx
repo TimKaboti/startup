@@ -3,11 +3,19 @@ import './admin.css';
 
 export function Admin() {
     const [rings, setRings] = useState([]);
+    const [competitors, setCompetitors] = useState([]);
+    const [selectedCompetitor, setSelectedCompetitor] = useState('');
     const [selectedRingId, setSelectedRingId] = useState(null);
 
     useEffect(() => {
         const storedRings = JSON.parse(localStorage.getItem('rings')) || [];
         setRings(storedRings);
+    }, []);
+
+    useEffect(() => {
+        // Fetch the competitors who joined the tournament (can be fetched from localStorage or API)
+        const eventCompetitors = JSON.parse(localStorage.getItem('competitors')) || [];
+        setCompetitors(eventCompetitors);
     }, []);
 
     useEffect(() => {
@@ -22,7 +30,7 @@ export function Admin() {
             newRingId++;
         }
 
-        const newRing = { id: newRingId, matches: [] };
+        const newRing = { id: newRingId, matches: [], competitors: [] };
         setRings([...rings, newRing]);
     };
 
@@ -43,6 +51,7 @@ export function Admin() {
         });
 
         setRings(updatedRings);
+        localStorage.setItem('rings', JSON.stringify(updatedRings));
     };
 
     const addCompetitorToMatch = (ringId, matchId, competitorName) => {
@@ -54,7 +63,7 @@ export function Admin() {
                         if (match.id === matchId) {
                             return {
                                 ...match,
-                                competitors: [...match.competitors, { id: Date.now(), name: competitorName, score: '' }]
+                                competitors: [...match.competitors, { id: Date.now(), name: competitorName, score: 0 }]
                             };
                         }
                         return match;
@@ -119,16 +128,33 @@ export function Admin() {
                         {rings.find(ring => ring.id === selectedRingId)?.matches?.map((match) => (
                             <div key={match.id} className="match">
                                 <h5>Match {match.id}</h5>
-                                <input
-                                    type="text"
-                                    placeholder="Competitor Name"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && e.target.value.trim() !== '') {
-                                            addCompetitorToMatch(selectedRingId, match.id, e.target.value.trim());
-                                            e.target.value = '';
-                                        }
-                                    }}
-                                />
+
+                                {/* Competitor Dropdown */}
+                                <div>
+                                    <label>Select Competitor:</label>
+                                    <select
+                                        value={selectedCompetitor}
+                                        onChange={(e) => setSelectedCompetitor(e.target.value)}
+                                    >
+                                        <option value="">Select a Competitor</option>
+                                        {competitors.map((competitor, index) => (
+                                            <option key={index} value={competitor.name}>
+                                                {competitor.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        onClick={() => {
+                                            if (selectedCompetitor.trim() !== '') {
+                                                addCompetitorToMatch(selectedRingId, match.id, selectedCompetitor.trim());
+                                                setSelectedCompetitor(''); // Reset selection
+                                            }
+                                        }}
+                                    >
+                                        Add Competitor
+                                    </button>
+                                </div>
+
                                 <div className="competitors">
                                     <h4>Scores</h4> {/* Added Scores label */}
                                     {match.competitors.map((competitor) => (
