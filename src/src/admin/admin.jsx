@@ -20,7 +20,6 @@ export function Admin() {
         const existingIds = rings.map(ring => ring.id);
         let newRingId = 1;
 
-        // Find the lowest available ID
         while (existingIds.includes(newRingId)) {
             newRingId++;
         }
@@ -32,7 +31,7 @@ export function Admin() {
     const deleteRing = (ringId) => {
         const updatedRings = rings.filter(ring => ring.id !== ringId);
         setRings(updatedRings);
-        setSelectedRingId(null); // Deselect if the deleted ring was selected
+        setSelectedRingId(null);
     };
 
     const addMatch = (ringId) => {
@@ -134,15 +133,15 @@ export function Admin() {
                                     }}
                                 />
                                 <div className="competitors">
-                                    <h4>Competitors</h4>
+                                    <h4>Scores</h4> {/* Added Scores label */}
                                     {match.competitors.map((competitor) => (
                                         <div key={competitor.id} className="competitor-row">
                                             <span className="competitor-name">{competitor.name}</span>
                                             <input
-                                                type="number"
+                                                type="text" // Changed from number to text
                                                 className="score-input"
                                                 value={competitor.score}
-                                                onChange={(e) => updateCompetitorScore(selectedRingId, match.id, competitor.id, parseInt(e.target.value) || 0)}
+                                                onChange={(e) => updateCompetitorScore(selectedRingId, match.id, competitor.id, e.target.value)}
                                             />
                                         </div>
                                     ))}

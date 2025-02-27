@@ -64,6 +64,21 @@ h2 {
     flex: 1;
 }
 
+.competitor-row {
+    display: flex;
+    align-items: center;
+    /* Align items vertically centered */
+    margin-bottom: 10px;
+    /* Add space between competitors */
+}
+
+.competitor-name {
+    margin-right: 10px;
+    /* Add space between name and input box */
+    font-weight: bold;
+    /* Make the competitor name bold */
+}
+
 .competitor-item {
     font-size: 1.2em;
     padding: 4px 0;
@@ -77,9 +92,12 @@ h2 {
 }
 
 .score-input {
-    width: 50px;
-    padding: 5px;
+    width: 80px;
+    /* Increase the width of the score input box */
+    padding: 8px;
+    /* Add padding for better touch targets */
     text-align: center;
+    /* Center the text in the input */
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1em;
