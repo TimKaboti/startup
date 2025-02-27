@@ -3,8 +3,6 @@ import './admin.css';
 
 export function Admin() {
     const [rings, setRings] = useState([]);
-    const [competitors, setCompetitors] = useState([]);
-    const [competitorName, setCompetitorName] = useState('');
     const [selectedRingId, setSelectedRingId] = useState(null);
 
     useEffect(() => {
@@ -24,7 +22,7 @@ export function Admin() {
             newRingId++;
         }
 
-        const newRing = { id: newRingId, matches: [], competitors: [] };
+        const newRing = { id: newRingId, matches: [] };
         setRings([...rings, newRing]);
     };
 
@@ -45,7 +43,6 @@ export function Admin() {
         });
 
         setRings(updatedRings);
-        localStorage.setItem('rings', JSON.stringify(updatedRings));
     };
 
     const addCompetitorToMatch = (ringId, matchId, competitorName) => {
@@ -57,7 +54,7 @@ export function Admin() {
                         if (match.id === matchId) {
                             return {
                                 ...match,
-                                competitors: [...match.competitors, { id: Date.now(), name: competitorName, score: 0 }]
+                                competitors: [...match.competitors, { id: Date.now(), name: competitorName, score: '' }]
                             };
                         }
                         return match;
