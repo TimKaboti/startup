@@ -5,17 +5,41 @@ import './login.css';
 export function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate(); // React Router's navigate hook
+    const navigate = useNavigate();
 
-    // Handle form submission
     const handleSubmit = (event) => {
         event.preventDefault();
-        // Handle login logic here
-        // Redirect after login success
-        navigate('/events'); // Navigates to the events page
+        const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+        const foundUser = storedUsers.find(user => user.email === email && user.password === password);
+
+        if (foundUser) {
+            localStorage.setItem('loggedInUser', JSON.stringify(foundUser));
+            navigate('/events');
+        } else {
+            alert('Invalid email or password.');
+        }
     };
 
+    const handleCreateUser = () => {
+        if (!email || !password) {
+            alert('Please enter an email and password.');
+            return;
+        }
 
+        const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
+        const userExists = storedUsers.some(user => user.email === email);
+
+        if (userExists) {
+            alert('User already exists. Please log in.');
+            return;
+        }
+
+        const newUser = { email, password };
+        localStorage.setItem('users', JSON.stringify([...storedUsers, newUser]));
+        alert('User created successfully! You can now log in.');
+        setEmail('');
+        setPassword('');
+    };
 
     return (
         <main className="index-main" style={{ fontFamily: 'Exo' }}>
@@ -38,7 +62,7 @@ export function Login() {
                     />
                 </div>
                 <button type="submit">Login</button>
-                <button type="button" onClick={() => navigate('/create')}>Create</button>
+                <button type="button" onClick={handleCreateUser}>Create</button>
             </form>
         </main>
     );

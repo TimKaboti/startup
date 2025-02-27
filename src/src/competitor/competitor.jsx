@@ -7,11 +7,14 @@ export function Competitor() {
     const [isInfoActive, setIsInfoActive] = useState(false); // State to control dropdown visibility
 
     useEffect(() => {
-        // Fetch competitor info
-        fetch('/competitor.json')
-            .then(response => response.json())
-            .then(data => setCompetitor(data))
-            .catch(error => console.error('Error fetching competitor data:', error));
+        // Load logged-in user info from localStorage
+        const storedUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+        if (storedUser) {
+            setCompetitor(storedUser);
+        } else {
+            setCompetitor({ name: 'Guest', age: '-', rank: '-' });
+        }
 
         // Fetch competitor's events
         fetch('/competitorEvents.json')
