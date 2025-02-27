@@ -7,53 +7,57 @@ export function Admin() {
     const [competitorName, setCompetitorName] = useState('');
     const [selectedRingId, setSelectedRingId] = useState(null);
 
-    // Load stored rings from localStorage on mount
     useEffect(() => {
         const storedRings = JSON.parse(localStorage.getItem('rings')) || [];
         setRings(storedRings);
     }, []);
 
-    // Update localStorage whenever rings change
     useEffect(() => {
         localStorage.setItem('rings', JSON.stringify(rings));
     }, [rings]);
 
-    // Function to add a new ring
+    // Updated addRing function: always picks the smallest missing ring ID
     const addRing = () => {
-        const newRingId = rings.length ? Math.max(...rings.map(ring => ring.id)) + 1 : 1;
-        const newRing = { id: newRingId, matches: [], competitors: [] };
-        setRings([...rings, newRing]);
+        setRings(prevRings => {
+            let newRingId = 1;
+            while (prevRings.some(ring => ring.id === newRingId)) {
+                newRingId++;
+            }
+            console.log("New ring ID:", newRingId);
+            return [...prevRings, { id: newRingId, matches: [], competitors: [] }];
+        });
     };
 
-    // Function to add a competitor
-    const addCompetitor = (ringId) => {
-        if (!competitorName) return; // Validate input
-
-        const newCompetitor = { id: competitors.length + 1, name: competitorName };
-        const updatedCompetitors = [...competitors, newCompetitor];
-        setCompetitors(updatedCompetitors);
-
+    const addMatch = (ringId) => {
         const updatedRings = rings.map(ring => {
             if (ring.id === ringId) {
-                return { ...ring, competitors: [...(ring.competitors || []), newCompetitor] };
+                const matchNumber = (ring.matches?.length || 0) + 1;
+                const newMatch = { id: matchNumber, competitors: [] };
+                return { ...ring, matches: [...(ring.matches || []), newMatch] };
             }
             return ring;
         });
+
         setRings(updatedRings);
-        setCompetitorName(''); // Clear input after adding
+        localStorage.setItem('rings', JSON.stringify(updatedRings));
     };
 
-    // Function to select a ring
     const selectRing = (ringId) => {
-        setSelectedRingId(ringId);
+        console.log("Selecting ring:", ringId);
+        const ringExists = rings.some(ring => ring.id === ringId);
+        console.log("Ring exists:", ringExists);
+        if (ringExists) {
+            setSelectedRingId(ringId);
+        } else {
+            setSelectedRingId(null);
+        }
     };
 
-    // Function to delete a ring
     const deleteRing = (ringId) => {
         const updatedRings = rings.filter(ring => ring.id !== ringId);
         setRings(updatedRings);
         if (selectedRingId === ringId) {
-            setSelectedRingId(null); // Deselect if the deleted ring was selected
+            setSelectedRingId(null);
         }
     };
 
@@ -72,34 +76,20 @@ export function Admin() {
                         </button>
                     ))}
                 </div>
-                {selectedRingId && (
+                {selectedRingId !== null && (
                     <div className="ring-details">
                         <h3>Details for Ring {selectedRingId}</h3>
                         <button onClick={() => addMatch(selectedRingId)}>Add Match</button>
                         <button onClick={() => deleteRing(selectedRingId)}>Delete Ring</button>
-                        <div className="competitor-input">
-                            <input
-                                type="text"
-                                placeholder="Enter competitor name"
-                                value={competitorName}
-                                onChange={(e) => setCompetitorName(e.target.value)}
-                            />
-                            <button onClick={() => addCompetitor(selectedRingId)}>Add Competitor</button>
-                        </div>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {rings.find(ring => ring.id === selectedRingId)?.competitors?.map((competitor) => (
-                                    <tr key={competitor.id}>
-                                        <td>{competitor.name}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <h4>Matches</h4>
+                        {rings.find(ring => ring.id === selectedRingId)?.matches?.map((match) => (
+                            <div key={match.id} className="match">
+                                <h5>Match {match.id}</h5>
+                                <p>
+                                    Competitors: {match.competitors.length > 0 ? match.competitors.map(c => c.name).join(', ') : "None"}
+                                </p>
+                            </div>
+                        ))}
                     </div>
                 )}
                 <button onClick={addRing}>Add Ring</button>
