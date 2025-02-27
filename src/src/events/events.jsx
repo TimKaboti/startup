@@ -27,7 +27,7 @@ export function Events() {
         if (selectedEventData) {
             if (role === 'competitor') {
                 // Navigate to competitor page with event details
-                navigate(`/event/${selectedEventData.id}`);
+                navigate(`/competitor/${selectedEventData.id}`); // Updated route
             } else if (role === 'admin') {
                 // Navigate to admin page for the selected event
                 navigate(`/admin/${selectedEventData.id}`); // Updated route

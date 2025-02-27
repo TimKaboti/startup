@@ -51,7 +51,7 @@ export default function App() {
                         <Route path="/" element={<Login />} />
                         <Route path="/Login" element={<Login />} />
                         <Route path="/admin/:eventId" element={<Admin />} />
-                        <Route path="/event/:eventId" element={<Competitor />} /> {/* Update to match /event/:eventId */}
+                        <Route path="/competitor/:eventId" element={<Competitor />} /> {/* Updated to match /competitor/:eventId */}
                         <Route path="/events" element={<Events />} />
                         <Route path="/about" element={<About />} />
                         <Route path="*" element={<NotFound />} />

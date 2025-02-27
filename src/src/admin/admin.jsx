@@ -18,12 +18,8 @@ export function Admin() {
     useEffect(() => {
         // Fetch the competitors who joined the tournament (can be fetched from localStorage or API)
         const eventCompetitors = JSON.parse(localStorage.getItem('competitors')) || [];
-        setCompetitors(eventCompetitors);
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('rings', JSON.stringify(rings));
-    }, [rings]);
+        setCompetitors(eventCompetitors.filter(competitor => competitor.eventId === eventId)); // Filter competitors by eventId
+    }, [eventId]);
 
     const addRing = () => {
         const existingIds = rings.map(ring => ring.id);
@@ -34,13 +30,16 @@ export function Admin() {
         }
 
         const newRing = { id: newRingId, eventId: eventId, matches: [], competitors: [] };
-        setRings([...rings, newRing]);
+        const updatedRings = [...rings, newRing];
+        setRings(updatedRings);
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     const deleteRing = (ringId) => {
         const updatedRings = rings.filter(ring => ring.id !== ringId);
         setRings(updatedRings);
         setSelectedRingId(null);
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     const addMatch = (ringId) => {
@@ -54,7 +53,7 @@ export function Admin() {
         });
 
         setRings(updatedRings);
-        localStorage.setItem('rings', JSON.stringify(updatedRings));
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     const addCompetitorToMatch = (ringId, matchId, competitorName) => {
@@ -75,7 +74,9 @@ export function Admin() {
             }
             return ring;
         });
+
         setRings(updatedRings);
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     const updateCompetitorScore = (ringId, matchId, competitorId, newScore) => {
@@ -98,7 +99,9 @@ export function Admin() {
             }
             return ring;
         });
+
         setRings(updatedRings);
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     return (
