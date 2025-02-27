@@ -13,11 +13,18 @@ export function Competitor() {
     const role = location.state?.role; // Retrieve user role from state
 
     useEffect(() => {
-        // Fetch competitor info
-        fetch('/competitor.json')
-            .then(response => response.json())
-            .then(data => setCompetitor(data))
-            .catch(error => console.error('Error fetching competitor data:', error));
+        // Retrieve competitor information from sessionStorage
+        const storedCompetitor = JSON.parse(sessionStorage.getItem('loggedInUser')); // <-- update key here
+        console.log('Stored Competitor:', storedCompetitor); // Debugging log
+        if (storedCompetitor) {
+            setCompetitor({
+                name: storedCompetitor.name,
+                age: storedCompetitor.age,
+                rank: storedCompetitor.rank
+            });
+        } else {
+            console.error('No competitor data found in sessionStorage.');
+        }
 
         // Fetch competitor's events
         fetch('/competitorEvents.json')

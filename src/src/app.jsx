@@ -6,24 +6,19 @@ import './app.css';
 import { Login } from './login/login';
 import { Events } from './events/events';
 import { Admin } from './admin/admin';
-import { Competitor } from './competitor/competitor';
+import { Competitor } from './competitor/competitor';  // Import Competitor
 import { About } from './about/about';
 
 export default function App() {
-    // React state for dropdown menu visibility
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // Toggle function for dropdown menu
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     };
 
-    console.log("App component rendered!");
-
     return (
         <BrowserRouter>
             <div className="app">
-                {/* Header Section */}
                 <header>
                     <div className="title-container">
                         <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
@@ -31,8 +26,6 @@ export default function App() {
                             <img width="150px" src="kicker.png" alt="random" />
                         </div>
                     </div>
-
-                    {/* Navigation Section */}
                     <nav>
                         <button className="menu-toggle" onClick={toggleMenu}>
                             ☰
@@ -47,27 +40,24 @@ export default function App() {
                     </nav>
                 </header>
 
-                <div
-                    style={{
-                        backgroundImage: 'url(/blue-sides.jpg)', // Use absolute path
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        backgroundRepeat: 'no-repeat',
-                        minHeight: '100vh'
-                    }}>
-                    {/* Routes for different pages */}
+                <div style={{
+                    backgroundImage: 'url(/blue-sides.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    minHeight: '100vh'
+                }}>
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route path="/Login" element={<Login />} />
-                        <Route path="/admin/:eventId" element={<Admin />} /> {/* Updated route */}
-                        <Route path="/competitor" element={<Competitor />} />
+                        <Route path="/admin/:eventId" element={<Admin />} />
+                        <Route path="/event/:eventId" element={<Competitor />} /> {/* Update to match /event/:eventId */}
                         <Route path="/events" element={<Events />} />
                         <Route path="/about" element={<About />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
                 </div>
 
-                {/* Footer Section */}
                 <footer>
                     <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
                     <a href="https://github.com/TimKaboti/startup">GitHub</a>
@@ -77,7 +67,6 @@ export default function App() {
     );
 }
 
-// NotFound Component for 404 Pages
 function NotFound() {
     return <main className="container-fluid bg-secondary text-center">404: Return to sender. Address unknown.</main>;
 }
