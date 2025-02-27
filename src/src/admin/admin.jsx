@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './admin.css';
 
 export function Admin() {
+    const { eventId } = useParams(); // Get the eventId from the URL
     const [rings, setRings] = useState([]);
     const [competitors, setCompetitors] = useState([]);
     const [selectedCompetitor, setSelectedCompetitor] = useState('');
     const [selectedRingId, setSelectedRingId] = useState(null);
 
+    // Fetch event-specific data based on eventId
     useEffect(() => {
         const storedRings = JSON.parse(localStorage.getItem('rings')) || [];
-        setRings(storedRings);
-    }, []);
+        setRings(storedRings.filter(ring => ring.eventId === eventId)); // Filter rings by eventId
+    }, [eventId]);
 
     useEffect(() => {
         // Fetch the competitors who joined the tournament (can be fetched from localStorage or API)
@@ -30,7 +33,7 @@ export function Admin() {
             newRingId++;
         }
 
-        const newRing = { id: newRingId, matches: [], competitors: [] };
+        const newRing = { id: newRingId, eventId: eventId, matches: [], competitors: [] };
         setRings([...rings, newRing]);
     };
 
@@ -101,7 +104,7 @@ export function Admin() {
     return (
         <main>
             <div className="main_info" style={{ fontFamily: 'Exo' }}>
-                <h2>RINGS</h2>
+                <h2>RINGS for Event {eventId}</h2> {/* Display eventId */}
                 <div className="tab-container">
                     {rings.map((ring) => (
                         <div key={ring.id} className="ring-button-container">

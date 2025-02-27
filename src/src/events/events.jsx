@@ -30,7 +30,7 @@ export function Events() {
                 navigate(`/event/${selectedEventData.id}`);
             } else if (role === 'admin') {
                 // Navigate to admin page for the selected event
-                navigate(`/admin/${selectedEventData.id}`);
+                navigate(`/admin/${selectedEventData.id}`); // Updated route
             }
         }
     };
@@ -46,14 +46,14 @@ export function Events() {
         localStorage.setItem('events', JSON.stringify([...existingEvents, newEvent]));
 
         // Navigate to admin page with the new event details
-        navigate(`/admin/${newEvent.id}`);
+        navigate(`/admin/${newEvent.id}`); // Updated route
 
         // Clear input field
         setEventName('');
     };
 
     return (
-        <main className="events-main" style={{ /* styles */ }}>
+        <main className="events-main">
             <h2>Join Existing Event</h2>
             <form onSubmit={handleJoinEvent}>
                 <div>
