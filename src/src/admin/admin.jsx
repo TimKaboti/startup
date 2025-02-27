@@ -16,16 +16,19 @@ export function Admin() {
         localStorage.setItem('rings', JSON.stringify(rings));
     }, [rings]);
 
-    // Updated addRing function: always picks the smallest missing ring ID
     const addRing = () => {
-        setRings(prevRings => {
-            let newRingId = 1;
-            while (prevRings.some(ring => ring.id === newRingId)) {
-                newRingId++;
+        const existingIds = rings.map(ring => ring.id).sort((a, b) => a - b);
+        let newRingId = 1;
+
+        for (let i = 0; i < existingIds.length; i++) {
+            if (existingIds[i] !== i + 1) {
+                newRingId = i + 1;
+                break;
             }
-            console.log("New ring ID:", newRingId);
-            return [...prevRings, { id: newRingId, matches: [], competitors: [] }];
-        });
+        }
+
+        const newRing = { id: newRingId, matches: [], competitors: [] };
+        setRings([...rings, newRing]);
     };
 
     const addMatch = (ringId) => {
@@ -42,23 +45,48 @@ export function Admin() {
         localStorage.setItem('rings', JSON.stringify(updatedRings));
     };
 
-    const selectRing = (ringId) => {
-        console.log("Selecting ring:", ringId);
-        const ringExists = rings.some(ring => ring.id === ringId);
-        console.log("Ring exists:", ringExists);
-        if (ringExists) {
-            setSelectedRingId(ringId);
-        } else {
-            setSelectedRingId(null);
-        }
+    const addCompetitorToMatch = (ringId, matchId, competitorName) => {
+        const updatedRings = rings.map(ring => {
+            if (ring.id === ringId) {
+                return {
+                    ...ring,
+                    matches: ring.matches.map(match => {
+                        if (match.id === matchId) {
+                            return {
+                                ...match,
+                                competitors: [...match.competitors, { id: Date.now(), name: competitorName, score: 0 }]
+                            };
+                        }
+                        return match;
+                    })
+                };
+            }
+            return ring;
+        });
+        setRings(updatedRings);
     };
 
-    const deleteRing = (ringId) => {
-        const updatedRings = rings.filter(ring => ring.id !== ringId);
+    const updateCompetitorScore = (ringId, matchId, competitorId, newScore) => {
+        const updatedRings = rings.map(ring => {
+            if (ring.id === ringId) {
+                return {
+                    ...ring,
+                    matches: ring.matches.map(match => {
+                        if (match.id === matchId) {
+                            return {
+                                ...match,
+                                competitors: match.competitors.map(competitor =>
+                                    competitor.id === competitorId ? { ...competitor, score: newScore } : competitor
+                                )
+                            };
+                        }
+                        return match;
+                    })
+                };
+            }
+            return ring;
+        });
         setRings(updatedRings);
-        if (selectedRingId === ringId) {
-            setSelectedRingId(null);
-        }
     };
 
     return (
@@ -70,7 +98,7 @@ export function Admin() {
                         <button
                             key={ring.id}
                             className={`tab ${selectedRingId === ring.id ? 'active' : ''}`}
-                            onClick={() => selectRing(ring.id)}
+                            onClick={() => setSelectedRingId(ring.id)}
                         >
                             Ring {ring.id}
                         </button>
@@ -80,14 +108,34 @@ export function Admin() {
                     <div className="ring-details">
                         <h3>Details for Ring {selectedRingId}</h3>
                         <button onClick={() => addMatch(selectedRingId)}>Add Match</button>
-                        <button onClick={() => deleteRing(selectedRingId)}>Delete Ring</button>
                         <h4>Matches</h4>
                         {rings.find(ring => ring.id === selectedRingId)?.matches?.map((match) => (
                             <div key={match.id} className="match">
                                 <h5>Match {match.id}</h5>
-                                <p>
-                                    Competitors: {match.competitors.length > 0 ? match.competitors.map(c => c.name).join(', ') : "None"}
-                                </p>
+                                <input
+                                    type="text"
+                                    placeholder="Competitor Name"
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && e.target.value.trim() !== '') {
+                                            addCompetitorToMatch(selectedRingId, match.id, e.target.value.trim());
+                                            e.target.value = '';
+                                        }
+                                    }}
+                                />
+                                <div className="competitors">
+                                    <h4>Competitors</h4>
+                                    {match.competitors.map((competitor) => (
+                                        <div key={competitor.id} className="competitor-row">
+                                            <span className="competitor-name">{competitor.name}</span>
+                                            <input
+                                                type="number"
+                                                className="score-input"
+                                                value={competitor.score}
+                                                onChange={(e) => updateCompetitorScore(selectedRingId, match.id, competitor.id, parseInt(e.target.value) || 0)}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         ))}
                     </div>

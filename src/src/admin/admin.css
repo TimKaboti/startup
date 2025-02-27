@@ -40,6 +40,52 @@ h2 {
     margin: auto;
 }
 
+/* Competitors List & Scores */
+.competitors-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.competitors-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 8px 0;
+    flex: 1;
+}
+
+.scores-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 8px 0;
+    flex: 1;
+}
+
+.competitor-item {
+    font-size: 1.2em;
+    padding: 4px 0;
+    cursor: pointer;
+}
+
+.score-title {
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+.score-input {
+    width: 50px;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+/* Buttons */
 button {
     padding: 8px 12px;
     margin: 5px;
@@ -68,9 +114,7 @@ button:hover {
     border-radius: 5px;
 }
 
-
 /*
-
 
 #add-ring-btn {
     position: absolute;
@@ -78,7 +122,6 @@ button:hover {
     left: 20px;
     z-index: 1;
 }
-
 
 .main_info h2 {
     text-align: center;
@@ -145,4 +188,4 @@ button:hover {
 .ring.selected h3 {
     background-color: #4CAF50;
     color: white;
-} */
+} 
