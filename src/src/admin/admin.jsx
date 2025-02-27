@@ -17,18 +17,22 @@ export function Admin() {
     }, [rings]);
 
     const addRing = () => {
-        const existingIds = rings.map(ring => ring.id).sort((a, b) => a - b);
+        const existingIds = rings.map(ring => ring.id);
         let newRingId = 1;
 
-        for (let i = 0; i < existingIds.length; i++) {
-            if (existingIds[i] !== i + 1) {
-                newRingId = i + 1;
-                break;
-            }
+        // Find the lowest available ID
+        while (existingIds.includes(newRingId)) {
+            newRingId++;
         }
 
         const newRing = { id: newRingId, matches: [], competitors: [] };
         setRings([...rings, newRing]);
+    };
+
+    const deleteRing = (ringId) => {
+        const updatedRings = rings.filter(ring => ring.id !== ringId);
+        setRings(updatedRings);
+        setSelectedRingId(null); // Deselect if the deleted ring was selected
     };
 
     const addMatch = (ringId) => {
@@ -95,13 +99,20 @@ export function Admin() {
                 <h2>RINGS</h2>
                 <div className="tab-container">
                     {rings.map((ring) => (
-                        <button
-                            key={ring.id}
-                            className={`tab ${selectedRingId === ring.id ? 'active' : ''}`}
-                            onClick={() => setSelectedRingId(ring.id)}
-                        >
-                            Ring {ring.id}
-                        </button>
+                        <div key={ring.id} className="ring-button-container">
+                            <button
+                                className={`tab ${selectedRingId === ring.id ? 'active' : ''}`}
+                                onClick={() => setSelectedRingId(ring.id)}
+                            >
+                                Ring {ring.id}
+                            </button>
+                            <button
+                                className="delete-ring-button"
+                                onClick={() => deleteRing(ring.id)}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     ))}
                 </div>
                 {selectedRingId !== null && (

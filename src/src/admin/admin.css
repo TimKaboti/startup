@@ -101,6 +101,22 @@ button:hover {
     background-color: #0056b3;
 }
 
+/* Delete Ring Button */
+.delete-ring-button {
+    background-color: #ff4d4d;
+    /* Red background */
+    color: white;
+    /* White text */
+    border: 1px solid #cc0000;
+    /* Darker red border */
+}
+
+.delete-ring-button:hover {
+    background-color: #cc0000;
+    /* Darker red on hover */
+}
+
+/* Competitor Input */
 .competitor-input {
     display: flex;
     gap: 5px;
@@ -115,7 +131,6 @@ button:hover {
 }
 
 /*
-
 #add-ring-btn {
     position: absolute;
     top: 60px;
@@ -188,4 +203,4 @@ button:hover {
 .ring.selected h3 {
     background-color: #4CAF50;
     color: white;
-} 
+}
