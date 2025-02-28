@@ -18,16 +18,9 @@ export function Login() {
         const user = users.find((u) => u.email === email && u.password === password);
 
         if (user) {
-            // Store the logged-in user in sessionStorage with role
             const loggedInUser = { ...user, role };
             sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
-            // Redirect based on role
-            if (role === 'admin') {
-                navigate('/events');  // Admin will be redirected to events first
-            } else {
-                navigate('/events');  // Competitor will also be redirected to events
-            }
+            navigate('/events');
         } else {
             alert('Invalid email or password');
         }
@@ -59,61 +52,86 @@ export function Login() {
     };
 
     return (
-        <main className="index-main" style={{ fontFamily: 'Exo' }}>
-            <h2>{isCreating ? 'Create Account' : 'Login'}</h2>
-            <form onSubmit={handleSubmit}>
-                {isCreating && (
-                    <>
-                        <div>
-                            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-                        </div>
-                        <div>
-                            <input type="number" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} />
-                        </div>
-                        <div>
-                            <input type="text" placeholder="Rank" value={rank} onChange={(e) => setRank(e.target.value)} />
-                        </div>
-                    </>
-                )}
-
-                {!isCreating && (
-                    <div className="role-selection">
-                        <label>
-                            <input
-                                type="radio"
-                                value="competitor"
-                                checked={role === 'competitor'}
-                                onChange={() => setRole('competitor')}
-                            />
-                            Competitor
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                value="admin"
-                                checked={role === 'admin'}
-                                onChange={() => setRole('admin')}
-                            />
-                            Admin
-                        </label>
+        <>
+            {/* Header */}
+            <header>
+                <div className="title-container">
+                    <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
+                    <div id="picture" className="picture-box">
+                        <img width="150px" src="kicker.png" alt="random" />
                     </div>
-                )}
+                </div>
+                {/* Menu with only "About" */}
+                <nav>
+                    <ul className="dropdown show">
+                        <li><a href="/about">About</a></li>
+                    </ul>
+                </nav>
+            </header>
 
-                <div>
-                    <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div>
-                    <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                {isCreating ? (
-                    <button type="button" onClick={handleCreateUser}>Create Account</button>
-                ) : (
-                    <button type="submit">Login</button>
-                )}
-                <button type="button" onClick={() => setIsCreating(!isCreating)}>
-                    {isCreating ? 'Back to Login' : 'Create Account'}
-                </button>
-            </form>
-        </main>
+            {/* Main Content */}
+            <main className="index-main" style={{ fontFamily: 'Exo' }}>
+                <h2>{isCreating ? 'Create Account' : 'Login'}</h2>
+                <form onSubmit={handleSubmit}>
+                    {isCreating && (
+                        <>
+                            <div>
+                                <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+                            </div>
+                            <div>
+                                <input type="number" placeholder="Age" value={age} onChange={(e) => setAge(e.target.value)} />
+                            </div>
+                            <div>
+                                <input type="text" placeholder="Rank" value={rank} onChange={(e) => setRank(e.target.value)} />
+                            </div>
+                        </>
+                    )}
+
+                    {!isCreating && (
+                        <div className="role-selection">
+                            <label>
+                                <input
+                                    type="radio"
+                                    value="competitor"
+                                    checked={role === 'competitor'}
+                                    onChange={() => setRole('competitor')}
+                                />
+                                Competitor
+                            </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    value="admin"
+                                    checked={role === 'admin'}
+                                    onChange={() => setRole('admin')}
+                                />
+                                Admin
+                            </label>
+                        </div>
+                    )}
+
+                    <div>
+                        <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                    <div>
+                        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                    </div>
+                    {isCreating ? (
+                        <button type="button" onClick={handleCreateUser}>Create Account</button>
+                    ) : (
+                        <button type="submit">Login</button>
+                    )}
+                    <button type="button" onClick={() => setIsCreating(!isCreating)}>
+                        {isCreating ? 'Back to Login' : 'Create Account'}
+                    </button>
+                </form>
+            </main>
+
+            {/* Footer */}
+            <footer>
+                <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
+                <a href="https://github.com/TimKaboti/startup">GitHub</a>
+            </footer>
+        </>
     );
 }
