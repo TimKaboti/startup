@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, NavLink } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './admin.css';
 
 export function Admin() {
-    const { eventId } = useParams();
+    const { eventId } = useParams(); // Get the eventId from the URL
     const [rings, setRings] = useState([]);
     const [competitors, setCompetitors] = useState([]);
     const [selectedCompetitor, setSelectedCompetitor] = useState('');
@@ -12,13 +12,13 @@ export function Admin() {
     // Fetch event-specific data based on eventId
     useEffect(() => {
         const storedRings = JSON.parse(localStorage.getItem('rings')) || [];
-        setRings(storedRings.filter(ring => ring.eventId === eventId));
+        setRings(storedRings.filter(ring => ring.eventId === eventId)); // Filter rings by eventId
     }, [eventId]);
 
     useEffect(() => {
-        // Fetch the competitors who joined the tournament
+        // Fetch the competitors who joined the tournament (can be fetched from localStorage or API)
         const eventCompetitors = JSON.parse(localStorage.getItem('competitors')) || [];
-        setCompetitors(eventCompetitors.filter(competitor => competitor.eventId === eventId));
+        setCompetitors(eventCompetitors.filter(competitor => competitor.eventId === eventId)); // Filter competitors by eventId
     }, [eventId]);
 
     const addRing = () => {
@@ -32,14 +32,14 @@ export function Admin() {
         const newRing = { id: newRingId, eventId: eventId, matches: [], competitors: [] };
         const updatedRings = [...rings, newRing];
         setRings(updatedRings);
-        localStorage.setItem('rings', JSON.stringify(updatedRings));
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     const deleteRing = (ringId) => {
         const updatedRings = rings.filter(ring => ring.id !== ringId);
         setRings(updatedRings);
         setSelectedRingId(null);
-        localStorage.setItem('rings', JSON.stringify(updatedRings));
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     const addMatch = (ringId) => {
@@ -53,7 +53,7 @@ export function Admin() {
         });
 
         setRings(updatedRings);
-        localStorage.setItem('rings', JSON.stringify(updatedRings));
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     const addCompetitorToMatch = (ringId, matchId, competitorName) => {
@@ -76,7 +76,7 @@ export function Admin() {
         });
 
         setRings(updatedRings);
-        localStorage.setItem('rings', JSON.stringify(updatedRings));
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     const updateCompetitorScore = (ringId, matchId, competitorId, newScore) => {
@@ -101,29 +101,13 @@ export function Admin() {
         });
 
         setRings(updatedRings);
-        localStorage.setItem('rings', JSON.stringify(updatedRings));
+        localStorage.setItem('rings', JSON.stringify(updatedRings)); // Save to localStorage
     };
 
     return (
-        <div className="app">
-            <header>
-                <div className="title-container">
-                    <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
-                    <div id="picture" className="picture-box">
-                        <img width="150px" src="kicker.png" alt="random" />
-                    </div>
-                </div>
-                <nav>
-                    <ul className="dropdown">
-                        <li><NavLink to="/login">Login</NavLink></li>
-                        <li><NavLink to="/events">Events</NavLink></li>
-                        <li><NavLink to="/about">About</NavLink></li>
-                    </ul>
-                </nav>
-            </header>
-
-            <div className="main_info" style={{ fontFamily: 'Exo', paddingTop: '100px' }}>
-                <h2>RINGS for Event {eventId}</h2>
+        <main>
+            <div className="main_info" style={{ fontFamily: 'Exo' }}>
+                <h2>RINGS for Event {eventId}</h2> {/* Display eventId */}
                 <div className="tab-container">
                     {rings.map((ring) => (
                         <div key={ring.id} className="ring-button-container">
@@ -142,7 +126,6 @@ export function Admin() {
                         </div>
                     ))}
                 </div>
-
                 {selectedRingId !== null && (
                     <div className="ring-details">
                         <h3>Details for Ring {selectedRingId}</h3>
@@ -151,6 +134,8 @@ export function Admin() {
                         {rings.find(ring => ring.id === selectedRingId)?.matches?.map((match) => (
                             <div key={match.id} className="match">
                                 <h5>Match {match.id}</h5>
+
+                                {/* Competitor Dropdown */}
                                 <div>
                                     <label>Select Competitor:</label>
                                     <select
@@ -168,7 +153,7 @@ export function Admin() {
                                         onClick={() => {
                                             if (selectedCompetitor.trim() !== '') {
                                                 addCompetitorToMatch(selectedRingId, match.id, selectedCompetitor.trim());
-                                                setSelectedCompetitor('');
+                                                setSelectedCompetitor(''); // Reset selection
                                             }
                                         }}
                                     >
@@ -177,12 +162,12 @@ export function Admin() {
                                 </div>
 
                                 <div className="competitors">
-                                    <h4>Scores</h4>
+                                    <h4>Scores</h4> {/* Added Scores label */}
                                     {match.competitors.map((competitor) => (
                                         <div key={competitor.id} className="competitor-row">
                                             <span className="competitor-name">{competitor.name}</span>
                                             <input
-                                                type="text"
+                                                type="text" // Changed from number to text
                                                 className="score-input"
                                                 value={competitor.score}
                                                 onChange={(e) => updateCompetitorScore(selectedRingId, match.id, competitor.id, e.target.value)}
@@ -196,11 +181,6 @@ export function Admin() {
                 )}
                 <button onClick={addRing}>Add Ring</button>
             </div>
-
-            <footer>
-                <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
-                <a href="https://github.com/TimKaboti/startup">GitHub</a>
-            </footer>
-        </div>
+        </main>
     );
 }

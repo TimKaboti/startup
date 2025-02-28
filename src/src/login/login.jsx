@@ -54,20 +54,20 @@ export function Login() {
     return (
         <>
             {/* Header */}
-            <header>
+            {/* <header>
                 <div className="title-container">
                     <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
                     <div id="picture" className="picture-box">
                         <img width="150px" src="kicker.png" alt="random" />
                     </div>
                 </div>
-                {/* Menu with only "About" */}
+             
                 <nav>
                     <ul className="dropdown show">
                         <li><a href="/about">About</a></li>
                     </ul>
                 </nav>
-            </header>
+            </header> */}
 
             {/* Main Content */}
             <main className="index-main" style={{ fontFamily: 'Exo' }}>
@@ -128,10 +128,10 @@ export function Login() {
             </main>
 
             {/* Footer */}
-            <footer>
+            {/* <footer>
                 <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
                 <a href="https://github.com/TimKaboti/startup">GitHub</a>
-            </footer>
+            </footer> */}
         </>
     );
 }
