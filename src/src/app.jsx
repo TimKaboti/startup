@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 
@@ -13,41 +13,34 @@ export default function App() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* Layout applied only to specific pages */}
-                <Route element={<MainLayout />}>
-                    <Route path="/" element={<Login />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/about" element={<About />} />
-                </Route>
+                {/* Login page without header/footer */}
+                <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
 
-                {/* Admin and Competitor pages outside of MainLayout */}
-                <Route path="/admin/:eventId" element={<Admin />} />
+                {/* Pages with header/footer */}
+                <Route path="/" element={<MainLayout><Login /></MainLayout>} />
+                <Route path="/events" element={<MainLayout><Events /></MainLayout>} />
+                <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+                <Route path="/admin/:eventId" element={<MainLayout><Admin /></MainLayout>} />
+
+                {/* Competitor is separate */}
                 <Route path="/competitor/:eventId" element={<Competitor />} />
 
+                {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
     );
 }
 
-function MainLayout() {
+function MainLayout({ hideHeaderFooter = false, children }) {
     const [menuOpen, setMenuOpen] = useState(false);
-    const location = useLocation(); // This will now work properly inside BrowserRouter
 
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
-    };
-
-    // Determine which menu links should be hidden based on the current screen
-    const isOnLoginPage = location.pathname === "/login";
-    const isOnAdminPage = location.pathname.startsWith("/admin");
-    const isOnCompetitorPage = location.pathname.startsWith("/competitor");
+    const toggleMenu = () => setMenuOpen(!menuOpen);
 
     return (
         <div className="app">
-            {/* Header, only visible on pages other than login, admin, and competitor */}
-            {!isOnLoginPage && !isOnAdminPage && !isOnCompetitorPage && (
+            {/* Conditionally show header */}
+            {!hideHeaderFooter && (
                 <header>
                     <div className="title-container">
                         <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
@@ -56,13 +49,9 @@ function MainLayout() {
                         </div>
                     </div>
                     <nav>
-                        <button className="menu-toggle" onClick={toggleMenu}>
-                            ☰
-                        </button>
+                        <button className="menu-toggle" onClick={toggleMenu}>☰</button>
                         <ul className={`dropdown ${menuOpen ? "show" : ""}`}>
-                            {!isOnLoginPage && <li><NavLink to="/login" onClick={() => setMenuOpen(false)}>Login</NavLink></li>}
-                            {/* {!isOnAdminPage && <li><NavLink to="/admin" onClick={() => setMenuOpen(false)}>Admin Screen</NavLink></li>} */}
-                            {/* {!isOnCompetitorPage && <li><NavLink to="/competitor" onClick={() => setMenuOpen(false)}>Competitor Screen</NavLink></li>} */}
+                            <li><NavLink to="/login" onClick={() => setMenuOpen(false)}>Login</NavLink></li>
                             <li><NavLink to="/events" onClick={() => setMenuOpen(false)}>Events</NavLink></li>
                             <li><NavLink to="/about" onClick={() => setMenuOpen(false)}>About</NavLink></li>
                         </ul>
@@ -70,6 +59,7 @@ function MainLayout() {
                 </header>
             )}
 
+            {/* Background applied to all pages */}
             <div style={{
                 backgroundImage: 'url(/blue-sides.jpg)',
                 backgroundSize: 'cover',
@@ -77,18 +67,11 @@ function MainLayout() {
                 backgroundRepeat: 'no-repeat',
                 minHeight: '100vh'
             }}>
-                {/* This renders the child routes */}
-                <Routes>
-                    <Route path="/" element={<Login />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/about" element={<About />} />
-                    {/* Add more routes as necessary */}
-                </Routes>
+                {children} {/* Render the actual page content */}
             </div>
 
-            {/* Footer, only visible on pages other than login, admin, and competitor */}
-            {!isOnLoginPage && !isOnAdminPage && !isOnCompetitorPage && (
+            {/* Conditionally show footer */}
+            {!hideHeaderFooter && (
                 <footer>
                     <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
                     <a href="https://github.com/TimKaboti/startup">GitHub</a>
