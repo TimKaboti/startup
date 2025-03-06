@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './events.css';
+import ErrorBoundary from './ErrorBoundary'; // Import the ErrorBoundary component
 
 export function Events() {
     const navigate = useNavigate();
@@ -10,12 +11,10 @@ export function Events() {
 
     // Retrieve existing events from local storage
     const existingEvents = JSON.parse(localStorage.getItem('events')) || [];
-    console.log("Existing events:", existingEvents); // Log the existing events
 
     useEffect(() => {
         // Get logged in user data from sessionStorage
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        console.log("Logged in user:", loggedInUser); // Log logged-in user data
         if (loggedInUser) {
             setRole(loggedInUser.role); // Set role from logged-in user data
         }
@@ -55,7 +54,7 @@ export function Events() {
     };
 
     return (
-        <>
+        <ErrorBoundary> {/* Wrap the Events component in the ErrorBoundary */}
             {/* Main Content */}
             <main className="events-main">
                 <h2>Join Existing Event</h2>
@@ -86,12 +85,6 @@ export function Events() {
                     <button type="submit">Create</button>
                 </form>
             </main>
-
-            {/* Footer */}
-            {/* <footer>
-                <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
-                <a href="https://github.com/TimKaboti/startup">GitHub</a>
-            </footer> */}
-        </>
+        </ErrorBoundary>
     );
 }
