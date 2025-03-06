@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();  // Initialize app here
+const app = express();
 
 // Use CORS middleware before defining routes
-app.use(cors());  // Enable CORS for all routes
+app.use(cors()); // Enable CORS for all routes
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
@@ -13,6 +13,11 @@ app.use(express.static('public'));
 
 // Mock in-memory data for users
 let users = [];
+
+// Basic route
+app.get('/', (req, res) => {
+    res.send('Hello, world!');
+});
 
 // POST /api/users: Create a new user
 app.post('/api/users', (req, res) => {
@@ -40,9 +45,31 @@ app.post('/api/users', (req, res) => {
     res.status(201).json(newUser); // 201 status indicates resource creation
 });
 
-// Basic route
-app.get('/', (req, res) => {
-    res.send('Hello, world!');
+// GET /api/users: Fetch all users
+app.get('/api/users', (req, res) => {
+    res.status(200).json(users); // Respond with the list of users
+});
+
+// POST /api/login: Handle user login
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+
+    // Basic validation (ensure both email and password are provided)
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    // Search for the user with the given email
+    const user = users.find((u) => u.email === email);
+
+    // If no user found or password doesn't match, return an error
+    if (!user || user.password !== password) {
+        return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // Respond with the user details (excluding password)
+    const { password: _, ...userDetails } = user;
+    res.status(200).json(userDetails); // 200 status indicates successful login
 });
 
 const port = process.argv.length > 2 ? process.argv[2] : 4000;

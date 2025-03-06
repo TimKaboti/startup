@@ -15,21 +15,26 @@ export function Login() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // You can either use localStorage or backend for login. 
-        // Here we use backend API for login:
-
         try {
-            const response = await fetch('http://localhost:4000/api/users');
-            const users = await response.json();
+            const response = await fetch('http://localhost:4000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
 
-            const user = users.find((u) => u.email === email && u.password === password);
+            const data = await response.json();
 
-            if (user) {
-                const loggedInUser = { ...user, role };
-                sessionStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+            if (response.ok) {
+                // Store token and user data in sessionStorage or localStorage
+                sessionStorage.setItem('authToken', data.token);
+                sessionStorage.setItem('loggedInUser', JSON.stringify(data.user));
+
+                // Navigate to the events page
                 navigate('/events');
             } else {
-                alert('Invalid email or password');
+                alert(data.message);
             }
         } catch (error) {
             console.error('Error logging in:', error);
@@ -78,8 +83,6 @@ export function Login() {
             console.error('Error creating user:', error);
         }
     };
-
-
 
     return (
         <main className="index-main" style={{ fontFamily: 'Exo' }}>

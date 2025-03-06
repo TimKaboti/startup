@@ -10,10 +10,12 @@ export function Events() {
 
     // Retrieve existing events from local storage
     const existingEvents = JSON.parse(localStorage.getItem('events')) || [];
+    console.log("Existing events:", existingEvents); // Log the existing events
 
     useEffect(() => {
         // Get logged in user data from sessionStorage
         const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
+        console.log("Logged in user:", loggedInUser); // Log logged-in user data
         if (loggedInUser) {
             setRole(loggedInUser.role); // Set role from logged-in user data
         }
@@ -54,23 +56,6 @@ export function Events() {
 
     return (
         <>
-            {/* Header */}
-            {/* <header>
-                <div className="title-container">
-                    <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
-                    <div id="picture" className="picture-box">
-                        <img width="150px" src="kicker.png" alt="random" />
-                    </div>
-                </div>
-
-                <nav>
-                    <ul className="dropdown show">
-                        <li><a href="/login">Login</a></li>
-                        <li><a href="/about">About</a></li>
-                    </ul>
-                </nav>
-            </header> */}
-
             {/* Main Content */}
             <main className="events-main">
                 <h2>Join Existing Event</h2>
