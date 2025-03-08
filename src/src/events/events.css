@@ -30,7 +30,8 @@ body {
     text-align: center;
     padding: 20px;
     font-family: Exo;
-
+    display: block !important;
+    opacity: 1 !important;
 }
 
 .events-main form {

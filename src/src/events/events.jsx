@@ -1,36 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './events.css';
-import ErrorBoundary from './ErrorBoundary'; // Import the ErrorBoundary component
+import ErrorBoundary from './ErrorBoundary';
 
 export function Events() {
     const navigate = useNavigate();
     const [selectedEvent, setSelectedEvent] = useState('');
     const [eventName, setEventName] = useState('');
-    const [role, setRole] = useState('competitor'); // Default role
+    const [role, setRole] = useState('competitor');
 
-    // Retrieve existing events from local storage
-    const existingEvents = JSON.parse(localStorage.getItem('events')) || [];
+    // Safely retrieve existing events from local storage
+    let existingEvents = [];
+    try {
+        const storedEvents = localStorage.getItem('events');
+        console.log("Raw stored events:", storedEvents);
+        existingEvents = storedEvents ? JSON.parse(storedEvents) : [];
+    } catch (error) {
+        console.error("Error parsing stored events:", error);
+    }
 
     useEffect(() => {
-        // Get logged in user data from sessionStorage
-        const loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser'));
-        if (loggedInUser) {
-            setRole(loggedInUser.role); // Set role from logged-in user data
+        try {
+            const storedUser = sessionStorage.getItem('loggedInUser');
+            console.log("Raw stored user:", storedUser);
+            const loggedInUser = storedUser ? JSON.parse(storedUser) : null;
+            if (loggedInUser) {
+                setRole(loggedInUser.role);
+            }
+        } catch (error) {
+            console.error("Error parsing logged-in user data:", error);
         }
     }, []);
 
     const handleJoinEvent = (e) => {
         e.preventDefault();
-        if (!selectedEvent) return; // Ensure an event is selected
+        if (!selectedEvent) return;
 
         const selectedEventData = existingEvents.find(event => event.id === Number(selectedEvent));
+        console.log("Selected event data:", selectedEventData);
+
         if (selectedEventData) {
             if (role === 'competitor') {
-                // Navigate to competitor page with event details
                 navigate(`/competitor/${selectedEventData.id}`);
             } else if (role === 'admin') {
-                // Navigate to admin page for the selected event
                 navigate(`/admin/${selectedEventData.id}`);
             }
         }
@@ -38,24 +50,19 @@ export function Events() {
 
     const handleCreateEvent = (e) => {
         e.preventDefault();
-        if (!eventName.trim()) return; // Prevent empty event names
+        if (!eventName.trim()) return;
 
-        // Create new event object
         const newEvent = { id: existingEvents.length + 1, name: eventName };
+        console.log("Creating new event:", newEvent);
 
-        // Update local storage with the new event
         localStorage.setItem('events', JSON.stringify([...existingEvents, newEvent]));
 
-        // Navigate to admin page with the new event details
         navigate(`/admin/${newEvent.id}`);
-
-        // Clear input field
         setEventName('');
     };
 
     return (
-        <ErrorBoundary> {/* Wrap the Events component in the ErrorBoundary */}
-            {/* Main Content */}
+        <ErrorBoundary>
             <main className="events-main">
                 <h2>Join Existing Event</h2>
                 <form onSubmit={handleJoinEvent}>
