@@ -8,7 +8,7 @@ export function Login() {
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [rank, setRank] = useState('');
-    const [role, setRole] = useState('competitor');
+    const [role, setRole] = useState('competitor'); // Default role
     const [isCreating, setIsCreating] = useState(false);
     const navigate = useNavigate();
 
@@ -27,9 +27,11 @@ export function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                // Store token and user data in sessionStorage or localStorage
-                sessionStorage.setItem('authToken', data.token);
-                sessionStorage.setItem('loggedInUser', JSON.stringify(data.user));
+                console.log("✅ Login successful:", data);
+
+                // Store user info in sessionStorage
+                sessionStorage.setItem('authToken', data.token); // Save token if needed
+                sessionStorage.setItem('loggedInUser', JSON.stringify(data)); // Store user info correctly
 
                 // Navigate to the events page
                 navigate('/events');
@@ -37,11 +39,10 @@ export function Login() {
                 alert(data.message);
             }
         } catch (error) {
-            console.error('Error logging in:', error);
+            console.error('❌ Error logging in:', error);
             alert('Error logging in');
         }
     };
-
 
     const handleCreateUser = async () => {
         if (!email || !password || !name || !age || !rank) {
@@ -55,7 +56,7 @@ export function Login() {
             return;
         }
 
-        const newUser = { email, password, name, age, rank };
+        const newUser = { email, password, name, age, rank, role }; // Ensure role is included
 
         try {
             const response = await fetch('http://localhost:4000/api/users', {
@@ -68,6 +69,8 @@ export function Login() {
 
             if (response.ok) {
                 const createdUser = await response.json();
+                console.log("✅ User created successfully:", createdUser);
+
                 alert('User created successfully! You can now log in.');
                 setIsCreating(false);
                 setEmail('');
@@ -75,12 +78,13 @@ export function Login() {
                 setName('');
                 setAge('');
                 setRank('');
+                setRole('competitor'); // Reset to default role
             } else {
                 const errorData = await response.json();
                 alert(`Error: ${errorData.message}`);
             }
         } catch (error) {
-            console.error('Error creating user:', error);
+            console.error('❌ Error creating user:', error);
         }
     };
 

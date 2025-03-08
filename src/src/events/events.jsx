@@ -8,15 +8,14 @@ export function Events() {
     const [selectedEvent, setSelectedEvent] = useState('');
     const [eventName, setEventName] = useState('');
     const [role, setRole] = useState('competitor');
-    const [events, setEvents] = useState([]); // This will store fetched events from the backend
+    const [events, setEvents] = useState([]);
 
-    // Fetch existing events from the backend
     const fetchEvents = async () => {
         try {
             const response = await fetch('/api/events');
             if (response.ok) {
                 const data = await response.json();
-                setEvents(data); // Update state with fetched events
+                setEvents(data);
             } else {
                 console.error('Error fetching events:', response.statusText);
             }
@@ -26,12 +25,10 @@ export function Events() {
     };
 
     useEffect(() => {
-        fetchEvents(); // Fetch events on mount
-
+        fetchEvents();
         try {
             const loggedInUserData = sessionStorage.getItem('loggedInUser');
-            console.log("Raw loggedInUserData:", loggedInUserData); // Debugging log
-
+            console.log("Raw loggedInUserData:", loggedInUserData);
             if (loggedInUserData && loggedInUserData !== "undefined") {
                 const loggedInUser = JSON.parse(loggedInUserData);
                 setRole(loggedInUser.role);
@@ -45,15 +42,39 @@ export function Events() {
 
     const handleJoinEvent = async (e) => {
         e.preventDefault();
-        if (!selectedEvent) return;
+        console.log("✅ Join event form submitted");
 
-        const loggedInUserData = sessionStorage.getItem('loggedInUser');
-        if (!loggedInUserData) {
-            console.error("No logged-in user found");
+        if (!selectedEvent) {
+            console.error("❌ No event selected!");
+            alert("Please select an event before joining.");
             return;
         }
 
-        const user = JSON.parse(loggedInUserData);
+        const loggedInUserData = sessionStorage.getItem('loggedInUser');
+        if (!loggedInUserData || loggedInUserData === "undefined") {
+            console.error("❌ No logged-in user found. Please log in first.");
+            alert("You must be logged in to join an event!");
+            navigate("/login");
+            return;
+        }
+
+        let user;
+        try {
+            user = JSON.parse(loggedInUserData);
+            if (!user || !user.email) {
+                throw new Error("Invalid user data");
+            }
+        } catch (error) {
+            console.error("❌ Error parsing logged-in user data:", error);
+            alert("Invalid user data. Please log in again.");
+            sessionStorage.clear();
+            navigate("/login");
+            return;
+        }
+
+        console.log("🔹 User attempting to join:", user);
+        console.log("🔹 Selected event ID:", selectedEvent);
+        console.log("🔹 Detected user role:", user.role); // ✅ Log the role
 
         try {
             const response = await fetch(`/api/events/${selectedEvent}/join`, {
@@ -64,21 +85,66 @@ export function Events() {
                 body: JSON.stringify({ user }),
             });
 
+            console.log("🔹 Response from join API:", response);
+
+            let responseData;
+            try {
+                responseData = await response.json();
+                console.log("🔹 Response JSON:", responseData);
+            } catch (err) {
+                console.error("❌ Failed to parse JSON response:", err);
+                responseData = { message: "Unknown error" };
+            }
+
+            // 🔥 If user is already in the event, redirect them immediately
+            if (response.status === 400 && responseData.message === "User is already in this event") {
+                console.warn("⚠️ User already joined this event. Redirecting now...");
+
+                // 🔥 Ensure correct role-based redirection
+                let redirectPath;
+                if (user.role === 'competitor') {
+                    redirectPath = `/competitor/${selectedEvent}`;
+                } else {
+                    redirectPath = `/admin/${selectedEvent}`;
+                }
+
+                console.log(`🔄 Navigating to ${redirectPath}...`);
+                navigate(redirectPath, { replace: true });
+
+                // 🔥 Force browser redirect as a backup
+                setTimeout(() => {
+                    console.log(`🔄 Forcing browser reload to ${redirectPath}...`);
+                    window.location.assign(redirectPath);
+                }, 500);
+                return;
+            }
+
             if (!response.ok) {
-                throw new Error('Failed to join event');
+                throw new Error(`Failed to join event: ${responseData.message}`);
             }
 
-            const updatedEvent = await response.json();
-            console.log("Joined event:", updatedEvent);
+            console.log("✅ Successfully joined event:", responseData);
 
-            // Redirect based on role
+            // 🔥 Ensure correct role-based redirection
+            let redirectPath;
             if (user.role === 'competitor') {
-                navigate(`/competitor/${updatedEvent.id}`);
-            } else if (user.role === 'admin') {
-                navigate(`/admin/${updatedEvent.id}`);
+                redirectPath = `/competitor/${selectedEvent}`;
+            } else {
+                redirectPath = `/admin/${selectedEvent}`;
             }
+
+            console.log(`🔄 Navigating to ${redirectPath}...`);
+            navigate(redirectPath, { replace: true });
+
+            // 🔥 Force browser redirect as a backup
+            setTimeout(() => {
+                console.log(`🔄 Forcing browser reload to ${redirectPath}...`);
+                window.location.assign(redirectPath);
+            }, 500);
+
         } catch (error) {
-            console.error("Error joining event:", error);
+            console.error("❌ Error joining event:", error);
+            alert(error.message);
         }
     };
 
@@ -102,9 +168,7 @@ export function Events() {
 
             const newEvent = await response.json();
             console.log("Created new event:", newEvent);
-
-            fetchEvents(); // Refresh the list of events
-
+            fetchEvents();
             navigate(`/admin/${newEvent.id}`);
             setEventName('');
         } catch (error) {

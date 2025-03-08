@@ -101,7 +101,7 @@ app.get('/api/events', (req, res) => {
     res.status(200).json(events); // Respond with the list of events
 });
 
-// PATCH /api/events/:id/join: Join an event
+
 // PATCH /api/events/:id/join: Join an event
 app.patch('/api/events/:id/join', (req, res) => {
     const { id } = req.params;

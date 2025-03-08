@@ -14,16 +14,14 @@ export default function App() {
         <BrowserRouter>
             <Routes>
                 {/* Login page without header/footer */}
-                <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
+                <Route path="/login" element={<MainLayout hideHeaderFooter><Login /></MainLayout>} />
 
                 {/* Pages with header/footer */}
                 <Route path="/" element={<MainLayout><Login /></MainLayout>} />
                 <Route path="/events" element={<MainLayout><Events /></MainLayout>} />
                 <Route path="/about" element={<MainLayout><About /></MainLayout>} />
                 <Route path="/admin/:eventId" element={<MainLayout><Admin /></MainLayout>} />
-
-                {/* Competitor is separate */}
-                <Route path="/competitor/:eventId" element={<Competitor />} />
+                <Route path="/competitor/:eventId" element={<MainLayout><Competitor /></MainLayout>} />
 
                 {/* Catch-all route */}
                 <Route path="*" element={<NotFound />} />
