@@ -11,8 +11,9 @@ app.use(express.json());
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
-// Mock in-memory data for users
+// Mock in-memory data for users and events
 let users = [];
+let events = [];
 
 // Basic route
 app.get('/', (req, res) => {
@@ -71,6 +72,56 @@ app.post('/api/login', (req, res) => {
     const { password: _, ...userDetails } = user;
     res.status(200).json(userDetails); // 200 status indicates successful login
 });
+
+// POST /api/events: Create a new event
+app.post('/api/events', (req, res) => {
+    const { name } = req.body;
+
+    // Basic validation (ensure name is provided)
+    if (!name) {
+        return res.status(400).json({ message: 'Event name is required' });
+    }
+
+    // Create a new event object
+    const newEvent = {
+        id: events.length + 1, // Simple ID generation
+        name,
+        participants: [] // Initialize participants as an empty array
+    };
+
+    // Add the event to the events array
+    events.push(newEvent);
+
+    // Respond with the created event
+    res.status(201).json(newEvent); // 201 status indicates resource creation
+});
+
+// GET /api/events: Fetch all events
+app.get('/api/events', (req, res) => {
+    res.status(200).json(events); // Respond with the list of events
+});
+
+// PATCH /api/events/:id/join: Join an event
+// PATCH /api/events/:id/join: Join an event
+app.patch('/api/events/:id/join', (req, res) => {
+    const { id } = req.params;
+    const { user } = req.body;
+
+    const event = events.find(event => event.id === parseInt(id));
+    if (!event) {
+        return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Check if user is already a participant
+    const isAlreadyParticipant = event.participants.some(participant => participant.email === user.email);
+    if (isAlreadyParticipant) {
+        return res.status(400).json({ message: 'User is already in this event' });
+    }
+
+    event.participants.push(user);
+    res.status(200).json(event);
+});
+
 
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 app.listen(port, () => {

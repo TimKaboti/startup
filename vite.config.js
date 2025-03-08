@@ -10,7 +10,11 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '/api': 'http://localhost:4000',  // Forward API requests to the backend running on port 4000
+            '/api': {
+                target: 'http://localhost:4000', // Forward API requests to the backend
+                changeOrigin: true, // Ensure the host header matches the target
+                secure: false, // Disable SSL verification (useful for local development)
+            },
         },
     },
 });

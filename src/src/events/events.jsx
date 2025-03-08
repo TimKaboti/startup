@@ -8,57 +8,108 @@ export function Events() {
     const [selectedEvent, setSelectedEvent] = useState('');
     const [eventName, setEventName] = useState('');
     const [role, setRole] = useState('competitor');
+    const [events, setEvents] = useState([]); // This will store fetched events from the backend
 
-    // Safely retrieve existing events from local storage
-    let existingEvents = [];
-    try {
-        const storedEvents = localStorage.getItem('events');
-        console.log("Raw stored events:", storedEvents);
-        existingEvents = storedEvents ? JSON.parse(storedEvents) : [];
-    } catch (error) {
-        console.error("Error parsing stored events:", error);
-    }
+    // Fetch existing events from the backend
+    const fetchEvents = async () => {
+        try {
+            const response = await fetch('/api/events');
+            if (response.ok) {
+                const data = await response.json();
+                setEvents(data); // Update state with fetched events
+            } else {
+                console.error('Error fetching events:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error fetching events:', error);
+        }
+    };
 
     useEffect(() => {
+        fetchEvents(); // Fetch events on mount
+
         try {
-            const storedUser = sessionStorage.getItem('loggedInUser');
-            console.log("Raw stored user:", storedUser);
-            const loggedInUser = storedUser ? JSON.parse(storedUser) : null;
-            if (loggedInUser) {
+            const loggedInUserData = sessionStorage.getItem('loggedInUser');
+            console.log("Raw loggedInUserData:", loggedInUserData); // Debugging log
+
+            if (loggedInUserData && loggedInUserData !== "undefined") {
+                const loggedInUser = JSON.parse(loggedInUserData);
                 setRole(loggedInUser.role);
+            } else {
+                console.warn("No valid logged-in user data found.");
             }
         } catch (error) {
             console.error("Error parsing logged-in user data:", error);
         }
     }, []);
 
-    const handleJoinEvent = (e) => {
+    const handleJoinEvent = async (e) => {
         e.preventDefault();
         if (!selectedEvent) return;
 
-        const selectedEventData = existingEvents.find(event => event.id === Number(selectedEvent));
-        console.log("Selected event data:", selectedEventData);
+        const loggedInUserData = sessionStorage.getItem('loggedInUser');
+        if (!loggedInUserData) {
+            console.error("No logged-in user found");
+            return;
+        }
 
-        if (selectedEventData) {
-            if (role === 'competitor') {
-                navigate(`/competitor/${selectedEventData.id}`);
-            } else if (role === 'admin') {
-                navigate(`/admin/${selectedEventData.id}`);
+        const user = JSON.parse(loggedInUserData);
+
+        try {
+            const response = await fetch(`/api/events/${selectedEvent}/join`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to join event');
             }
+
+            const updatedEvent = await response.json();
+            console.log("Joined event:", updatedEvent);
+
+            // Redirect based on role
+            if (user.role === 'competitor') {
+                navigate(`/competitor/${updatedEvent.id}`);
+            } else if (user.role === 'admin') {
+                navigate(`/admin/${updatedEvent.id}`);
+            }
+        } catch (error) {
+            console.error("Error joining event:", error);
         }
     };
 
-    const handleCreateEvent = (e) => {
+
+    const handleCreateEvent = async (e) => {
         e.preventDefault();
         if (!eventName.trim()) return;
 
-        const newEvent = { id: existingEvents.length + 1, name: eventName };
-        console.log("Creating new event:", newEvent);
+        try {
+            const response = await fetch('/api/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: eventName }),
+            });
 
-        localStorage.setItem('events', JSON.stringify([...existingEvents, newEvent]));
+            if (!response.ok) {
+                throw new Error('Failed to create event');
+            }
 
-        navigate(`/admin/${newEvent.id}`);
-        setEventName('');
+            const newEvent = await response.json();
+            console.log("Created new event:", newEvent);
+
+            fetchEvents(); // Refresh the list of events
+
+            navigate(`/admin/${newEvent.id}`);
+            setEventName('');
+        } catch (error) {
+            console.error("Error creating event:", error);
+        }
     };
 
     return (
@@ -69,7 +120,7 @@ export function Events() {
                     <div>
                         <select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)}>
                             <option value="" disabled>Select an Event</option>
-                            {existingEvents.map(event => (
+                            {events.map(event => (
                                 <option key={event.id} value={event.id}>
                                     {event.name}
                                 </option>
