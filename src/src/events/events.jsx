@@ -76,6 +76,11 @@ export function Events() {
         console.log("🔹 Selected event ID:", selectedEvent);
         console.log("🔹 Detected user role:", user.role); // ✅ Log the role
 
+        if (!user.role) {
+            console.warn("⚠️ User role not found, defaulting to competitor");
+            user.role = 'competitor'; // Default in case of missing role
+        }
+
         try {
             const response = await fetch(`/api/events/${selectedEvent}/join`, {
                 method: 'PATCH',
@@ -95,35 +100,6 @@ export function Events() {
                 console.error("❌ Failed to parse JSON response:", err);
                 responseData = { message: "Unknown error" };
             }
-
-            // 🔥 If user is already in the event, redirect them immediately
-            if (response.status === 400 && responseData.message === "User is already in this event") {
-                console.warn("⚠️ User already joined this event. Redirecting now...");
-
-                // 🔥 Ensure correct role-based redirection
-                let redirectPath;
-                if (user.role === 'competitor') {
-                    redirectPath = `/competitor/${selectedEvent}`;
-                } else {
-                    redirectPath = `/admin/${selectedEvent}`;
-                }
-
-                console.log(`🔄 Navigating to ${redirectPath}...`);
-                navigate(redirectPath, { replace: true });
-
-                // 🔥 Force browser redirect as a backup
-                setTimeout(() => {
-                    console.log(`🔄 Forcing browser reload to ${redirectPath}...`);
-                    window.location.assign(redirectPath);
-                }, 500);
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error(`Failed to join event: ${responseData.message}`);
-            }
-
-            console.log("✅ Successfully joined event:", responseData);
 
             // 🔥 Ensure correct role-based redirection
             let redirectPath;

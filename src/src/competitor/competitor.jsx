@@ -46,7 +46,7 @@ export function Competitor() {
 
     return (
         <>
-            <header>
+            {/* <header>
                 <div className="title-container">
                     <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
                     <div id="picture" className="picture-box">
@@ -54,12 +54,11 @@ export function Competitor() {
                     </div>
                 </div>
 
-                {/* Menu Toggle Button */}
+            
                 <button className="menu-toggle" onClick={toggleMenu}>
                     ☰
                 </button>
 
-                {/* Dropdown Menu */}
                 <nav>
                     <ul className={`dropdown ${isMenuOpen ? 'show' : ''}`}>
                         <li><a href="/login">Login</a></li>
@@ -67,7 +66,7 @@ export function Competitor() {
                         <li><a href="/about">About</a></li>
                     </ul>
                 </nav>
-            </header>
+            </header> */}
 
             <main style={{ fontFamily: 'Exo' }}>
                 <p className="quote">You Can Do This! This is an inspirational quote.</p>
@@ -125,10 +124,10 @@ export function Competitor() {
                 </div>
             </main>
 
-            <footer>
+            {/* <footer>
                 <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
                 <a href="https://github.com/TimKaboti/startup">GitHub</a>
-            </footer>
+            </footer> */}
         </>
     );
 }

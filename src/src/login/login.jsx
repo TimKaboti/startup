@@ -16,6 +16,8 @@ export function Login() {
         event.preventDefault();
 
         try {
+            sessionStorage.clear(); // 🔥 Ensure fresh session
+
             const response = await fetch('http://localhost:4000/api/login', {
                 method: 'POST',
                 headers: {
@@ -29,11 +31,14 @@ export function Login() {
             if (response.ok) {
                 console.log("✅ Login successful:", data);
 
-                // Store user info in sessionStorage
-                sessionStorage.setItem('authToken', data.token); // Save token if needed
-                sessionStorage.setItem('loggedInUser', JSON.stringify(data)); // Store user info correctly
+                // 🔥 Ensure role is correctly stored
+                if (!data.role) {
+                    console.warn("⚠️ No role found in user data, defaulting to 'competitor'.");
+                    data.role = 'competitor'; // Default in case of missing role
+                }
 
-                // Navigate to the events page
+                sessionStorage.setItem('loggedInUser', JSON.stringify(data));
+
                 navigate('/events');
             } else {
                 alert(data.message);
@@ -44,19 +49,14 @@ export function Login() {
         }
     };
 
+
     const handleCreateUser = async () => {
         if (!email || !password || !name || !age || !rank) {
             alert('Please fill in all fields');
             return;
         }
 
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        if (users.some((u) => u.email === email)) {
-            alert('Email already exists');
-            return;
-        }
-
-        const newUser = { email, password, name, age, rank, role }; // Ensure role is included
+        const newUser = { email, password, name, age, rank, role: 'competitor' }; // 🔥 Default role as 'competitor'
 
         try {
             const response = await fetch('http://localhost:4000/api/users', {
@@ -71,6 +71,9 @@ export function Login() {
                 const createdUser = await response.json();
                 console.log("✅ User created successfully:", createdUser);
 
+                // 🔥 Store the new user in sessionStorage with the correct role
+                sessionStorage.setItem('loggedInUser', JSON.stringify(createdUser));
+
                 alert('User created successfully! You can now log in.');
                 setIsCreating(false);
                 setEmail('');
@@ -78,7 +81,6 @@ export function Login() {
                 setName('');
                 setAge('');
                 setRank('');
-                setRole('competitor'); // Reset to default role
             } else {
                 const errorData = await response.json();
                 alert(`Error: ${errorData.message}`);
@@ -87,6 +89,7 @@ export function Login() {
             console.error('❌ Error creating user:', error);
         }
     };
+
 
     return (
         <main className="index-main" style={{ fontFamily: 'Exo' }}>
