@@ -54,16 +54,17 @@ export function Competitor() {
                     </div>
                 </div>
 
-            
+
                 <button className="menu-toggle" onClick={toggleMenu}>
                     ☰
                 </button>
 
                 <nav>
-                    <ul className={`dropdown ${isMenuOpen ? 'show' : ''}`}>
-                        <li><a href="/login">Login</a></li>
-                        <li><a href="/events">Events</a></li>
-                        <li><a href="/about">About</a></li>
+                    <button className="menu-toggle" onClick={toggleMenu}>☰</button>
+                    <ul className={`dropdown ${menuOpen ? "show" : ""}`}>
+                        <li><NavLink to="/events" onClick={() => setMenuOpen(false)}>Events</NavLink></li>
+                        <li><NavLink to="/about" onClick={() => setMenuOpen(false)}>About</NavLink></li>
+                        <li><NavLink to="/login" onClick={() => setMenuOpen(false)}>Logout</NavLink></li>
                     </ul>
                 </nav>
             </header> */}

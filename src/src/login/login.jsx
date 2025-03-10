@@ -8,7 +8,7 @@ export function Login() {
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [rank, setRank] = useState('');
-    const [role, setRole] = useState('competitor'); // Default role
+    const [role, setRole] = useState('competitor'); // ✅ Default role
     const [isCreating, setIsCreating] = useState(false);
     const navigate = useNavigate();
 
@@ -23,7 +23,7 @@ export function Login() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, password, role }),
             });
 
             const data = await response.json();
@@ -31,13 +31,18 @@ export function Login() {
             if (response.ok) {
                 console.log("✅ Login successful:", data);
 
-                // 🔥 Ensure role is correctly stored
-                if (!data.role) {
-                    console.warn("⚠️ No role found in user data, defaulting to 'competitor'.");
-                    data.role = 'competitor'; // Default in case of missing role
+                if (!data.token) {
+                    console.error("❌ No token received. Login failed.");
+                    alert("Authentication failed. No token received.");
+                    return;
                 }
 
-                sessionStorage.setItem('loggedInUser', JSON.stringify(data));
+                // 🔥 Ensure role is stored correctly
+                sessionStorage.setItem('authToken', data.token);
+                sessionStorage.setItem('loggedInUser', JSON.stringify({ ...data, role }));
+
+                console.log("🔒 AuthToken Stored:", data.token);
+                console.log("🔹 User role stored:", role);
 
                 navigate('/events');
             } else {
@@ -49,14 +54,13 @@ export function Login() {
         }
     };
 
-
     const handleCreateUser = async () => {
         if (!email || !password || !name || !age || !rank) {
             alert('Please fill in all fields');
             return;
         }
 
-        const newUser = { email, password, name, age, rank, role: 'competitor' }; // 🔥 Default role as 'competitor'
+        const newUser = { email, password, name, age, rank }; // ✅ No role selection here
 
         try {
             const response = await fetch('http://localhost:4000/api/users', {
@@ -71,7 +75,6 @@ export function Login() {
                 const createdUser = await response.json();
                 console.log("✅ User created successfully:", createdUser);
 
-                // 🔥 Store the new user in sessionStorage with the correct role
                 sessionStorage.setItem('loggedInUser', JSON.stringify(createdUser));
 
                 alert('User created successfully! You can now log in.');
@@ -90,6 +93,11 @@ export function Login() {
         }
     };
 
+    const handleLogout = () => {
+        console.log("🔒 Logging out...");
+        sessionStorage.clear();
+        navigate("/login");
+    };
 
     return (
         <main className="index-main" style={{ fontFamily: 'Exo' }}>
@@ -138,14 +146,18 @@ export function Login() {
                 <div>
                     <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
+
                 {isCreating ? (
                     <button type="button" onClick={handleCreateUser}>Create Account</button>
                 ) : (
                     <button type="submit">Login</button>
                 )}
+
                 <button type="button" onClick={() => setIsCreating(!isCreating)}>
                     {isCreating ? 'Back to Login' : 'Create Account'}
                 </button>
+
+
             </form>
         </main>
     );

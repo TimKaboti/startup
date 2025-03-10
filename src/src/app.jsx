@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 
@@ -13,17 +13,12 @@ export default function App() {
     return (
         <BrowserRouter>
             <Routes>
-                {/* Login page without header/footer */}
-                <Route path="/login" element={<MainLayout hideHeaderFooter><Login /></MainLayout>} />
-
-                {/* Pages with header/footer */}
+                <Route path="/login" element={<MainLayout hideHeaderFooter={false}><Login /></MainLayout>} />
                 <Route path="/" element={<MainLayout><Login /></MainLayout>} />
                 <Route path="/events" element={<MainLayout><Events /></MainLayout>} />
                 <Route path="/about" element={<MainLayout><About /></MainLayout>} />
                 <Route path="/admin/:eventId" element={<MainLayout><Admin /></MainLayout>} />
-                <Route path="/competitor/:eventId" element={<MainLayout><Competitor /></MainLayout>} />
-
-                {/* Catch-all route */}
+                <Route path="/competitor/:eventId" element={<Competitor />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>
@@ -32,12 +27,17 @@ export default function App() {
 
 function MainLayout({ hideHeaderFooter = false, children }) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
-    const toggleMenu = () => setMenuOpen(!menuOpen);
+    const handleLogout = () => {
+        console.log("🔒 Logging out...");
+        sessionStorage.clear();
+        setMenuOpen(false); // Close the dropdown menu after logout
+        navigate("/login");
+    };
 
     return (
         <div className="app">
-            {/* Conditionally show header */}
             {!hideHeaderFooter && (
                 <header>
                     <div className="title-container">
@@ -47,17 +47,16 @@ function MainLayout({ hideHeaderFooter = false, children }) {
                         </div>
                     </div>
                     <nav>
-                        <button className="menu-toggle" onClick={toggleMenu}>☰</button>
+                        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
                         <ul className={`dropdown ${menuOpen ? "show" : ""}`}>
                             <li><NavLink to="/login" onClick={() => setMenuOpen(false)}>Login</NavLink></li>
                             <li><NavLink to="/events" onClick={() => setMenuOpen(false)}>Events</NavLink></li>
                             <li><NavLink to="/about" onClick={() => setMenuOpen(false)}>About</NavLink></li>
+                            <li><button onClick={handleLogout} className="logout-button">Logout</button></li>
                         </ul>
                     </nav>
                 </header>
             )}
-
-            {/* Background applied to all pages */}
             <div style={{
                 backgroundImage: 'url(/blue-sides.jpg)',
                 backgroundSize: 'cover',
@@ -65,10 +64,8 @@ function MainLayout({ hideHeaderFooter = false, children }) {
                 backgroundRepeat: 'no-repeat',
                 minHeight: '100vh'
             }}>
-                {children} {/* Render the actual page content */}
+                {children}
             </div>
-
-            {/* Conditionally show footer */}
             {!hideHeaderFooter && (
                 <footer>
                     <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
