@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
@@ -13,7 +13,7 @@ export default function App() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/login" element={<MainLayout hideHeaderFooter={false}><Login /></MainLayout>} />
+                <Route path="/login" element={<MainLayout hideHeaderFooter={false} isLoginScreen={true}><Login /></MainLayout>} />
                 <Route path="/" element={<MainLayout><Login /></MainLayout>} />
                 <Route path="/events" element={<MainLayout><Events /></MainLayout>} />
                 <Route path="/about" element={<MainLayout><About /></MainLayout>} />
@@ -25,14 +25,23 @@ export default function App() {
     );
 }
 
-function MainLayout({ hideHeaderFooter = false, children }) {
+function MainLayout({ hideHeaderFooter = false, isLoginScreen = false, children }) {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [loggedInUser, setLoggedInUser] = useState(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const userData = sessionStorage.getItem('loggedInUser');
+        if (userData) {
+            setLoggedInUser(JSON.parse(userData));
+        }
+    }, []);
 
     const handleLogout = () => {
         console.log("🔒 Logging out...");
         sessionStorage.clear();
-        setMenuOpen(false); // Close the dropdown menu after logout
+        setLoggedInUser(null);
+        setMenuOpen(false);
         navigate("/login");
     };
 
@@ -49,10 +58,17 @@ function MainLayout({ hideHeaderFooter = false, children }) {
                     <nav>
                         <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>☰</button>
                         <ul className={`dropdown ${menuOpen ? "show" : ""}`}>
-                            <li><NavLink to="/login" onClick={() => setMenuOpen(false)}>Login</NavLink></li>
-                            <li><NavLink to="/events" onClick={() => setMenuOpen(false)}>Events</NavLink></li>
-                            <li><NavLink to="/about" onClick={() => setMenuOpen(false)}>About</NavLink></li>
-                            <li><button onClick={handleLogout} className="logout-button">Logout</button></li>
+                            {isLoginScreen ? (
+                                <li><NavLink to="/about" onClick={() => setMenuOpen(false)}>About</NavLink></li>
+                            ) : loggedInUser ? (
+                                <>
+                                    <li><NavLink to="/events" onClick={() => setMenuOpen(false)}>Events</NavLink></li>
+                                    <li><NavLink to="/about" onClick={() => setMenuOpen(false)}>About</NavLink></li>
+                                    <li><button onClick={handleLogout} className="logout-button">Logout</button></li>
+                                </>
+                            ) : (
+                                <li><NavLink to="/login" onClick={() => setMenuOpen(false)}>Login</NavLink></li>
+                            )}
                         </ul>
                     </nav>
                 </header>

@@ -11,7 +11,7 @@ export function About() {
 
     return (
         <div className="app">
-            <header>
+            {/* <header>
                 <div className="title-container">
                     <h1 style={{ fontFamily: 'Racing_Sans_One' }}>Tournevent</h1>
                     <div id="picture" className="picture-box">
@@ -26,7 +26,7 @@ export function About() {
                         <li><NavLink to="/login" onClick={() => setMenuOpen(false)}>Login</NavLink></li>
                     </ul>
                 </nav>
-            </header>
+            </header> */}
 
             <main
                 className="about-main"
@@ -53,10 +53,10 @@ export function About() {
                 </div>
             </main>
 
-            <footer>
+            {/* <footer>
                 <h3 style={{ fontFamily: 'ContrailOne' }}>Ty Tanner</h3>
                 <a href="https://github.com/TimKaboti/startup">GitHub</a>
-            </footer>
+            </footer> */}
         </div>
     );
 }
