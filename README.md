@@ -98,8 +98,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **All functionality implemented or mocked out** - I did not complete this part of the deliverable.
-- [ ] **Hooks** - I did not complete this part of the deliverable.
+- [x] **All functionality implemented or mocked out** - rings are easily toggled and only the selected ring fills the main div. rings have ability to add matches and add competitors to each match. competitors have an input box where their score can be recorded.
+a competitors chosen events are automatically generated on their own screen.
+- [x] **Hooks** - hooks and state have been applied to the competitor's events and to the competitors names and scores in admin.
 
 ## 🚀 Service deliverable
 
