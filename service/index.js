@@ -124,3 +124,23 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', 
 
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
+
+
+// 🔹 GET /api/events/:eventId/competitor/:competitorId/matches - Fetch matches for a competitor
+app.get('/api/events/:eventId/competitor/:competitorId/matches', (req, res) => {
+    const { eventId, competitorId } = req.params;
+
+    const event = events.find(event => event.id === parseInt(eventId));
+    if (!event) {
+        return res.status(404).json({ message: "Event not found" });
+    }
+
+    // 🔥 Find all matches where this competitor is assigned
+    const competitorMatches = event.rings
+        .flatMap(ring => ring.matches)
+        .filter(match => match.competitors.some(c => c.id === parseInt(competitorId)));
+
+    console.log(`✅ Returning matches for competitor ${competitorId}:`, competitorMatches);
+    res.status(200).json(competitorMatches);
+});
+

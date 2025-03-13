@@ -24,7 +24,6 @@ export function Admin() {
                 console.error("❌ Fetch rings error:", error);
             }
         };
-
         fetchRings();
     }, [eventId]);
 
@@ -67,9 +66,7 @@ export function Admin() {
 
             const newRing = await response.json();
             console.log("✅ Ring added successfully:", newRing);
-
-            // Update state to reflect new ring
-            setRings((prevRings) => [...prevRings, newRing]);
+            setRings([...rings, newRing]); // 🔥 Append new ring to state
         } catch (error) {
             console.error("❌ Error adding ring:", error);
         }
@@ -94,17 +91,13 @@ export function Admin() {
             const newMatch = await response.json();
             console.log("✅ Match added successfully:", newMatch);
 
-            // 🔥 Update state with the new match
-            setRings(prevRings =>
-                prevRings.map(ring =>
-                    ring.id === ringId ? { ...ring, matches: [...(ring.matches || []), newMatch] } : ring
-                )
-            );
+            setRings(prevRings => prevRings.map(ring =>
+                ring.id === ringId ? { ...ring, matches: [...(ring.matches || []), newMatch] } : ring
+            ));
         } catch (error) {
             console.error("❌ Error adding match:", error);
         }
     };
-
 
     // 🔹 Add a competitor to a match
     const addCompetitorToMatch = async (ringId, matchId, competitor) => {
@@ -126,7 +119,7 @@ export function Admin() {
             const updatedMatch = await response.json();
             console.log('✅ Competitor added to match:', updatedMatch);
 
-            // 🔥 Update state to reflect changes in UI
+            // 🔥 Update local state immediately
             setRings(prevRings =>
                 prevRings.map(ring =>
                     ring.id === ringId
@@ -141,55 +134,6 @@ export function Admin() {
             );
         } catch (error) {
             console.error('❌ Error adding competitor to match:', error);
-        }
-    };
-
-
-
-
-    // 🔹 Update a competitor's score
-    const updateCompetitorScore = async (ringId, matchId, competitorId, newScore) => {
-        try {
-            console.log(`🛠️ Updating score for competitor ${competitorId} in match ${matchId}`);
-
-            const response = await fetch(`/api/events/${eventId}/matches/${matchId}/update-score`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ competitorId, score: newScore }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("❌ Error updating score:", errorData.message);
-                return;
-            }
-
-            console.log("✅ Score updated successfully.");
-
-            // 🔥 Refresh match data for live updates
-            setRings(prevRings =>
-                prevRings.map(ring =>
-                    ring.id === ringId
-                        ? {
-                            ...ring,
-                            matches: ring.matches.map(match =>
-                                match.id === matchId
-                                    ? {
-                                        ...match,
-                                        competitors: match.competitors.map(competitor =>
-                                            competitor.id === competitorId
-                                                ? { ...competitor, score: newScore }
-                                                : competitor
-                                        ),
-                                    }
-                                    : match
-                            ),
-                        }
-                        : ring
-                )
-            );
-        } catch (error) {
-            console.error("❌ Error updating score:", error);
         }
     };
 
@@ -217,6 +161,30 @@ export function Admin() {
                         {rings.find(ring => ring.id === selectedRingId)?.matches?.map((match) => (
                             <div key={match.id} className="match">
                                 <h5>Match {match.id}</h5>
+
+                                {/* 🔥 Display competitors in the match */}
+                                <h4>Competitors in this Match</h4>
+                                {match.competitors.length > 0 ? (
+                                    <div>
+                                        {match.competitors.map((competitor) => (
+                                            <div key={competitor.id} className="competitor-row">
+                                                <span className="competitor-name">{competitor.name}</span>
+                                                <input
+                                                    type="text"  // ✅ Allows text-based score input
+                                                    className="score-input"
+                                                    value={competitor.score || ""}
+                                                    onChange={(e) =>
+                                                        updateCompetitorScore(selectedRingId, match.id, competitor.id, e.target.value)
+                                                    }
+                                                    placeholder="Enter Score"
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p>No competitors in this match yet.</p>
+                                )}
+
 
                                 {/* Competitor Dropdown */}
                                 <div>
