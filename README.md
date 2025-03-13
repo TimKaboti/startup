@@ -106,11 +106,13 @@ a competitors chosen events are automatically generated on their own screen.
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Node.js/Express HTTP service** - I use node.js and express
-- [ ] **Static middleware for frontend** - public files expressed using express
-- [ ] **Calls to third party endpoints** - 3rd party jokes and random facts indluded in competitor sreen
-- [ ] **Frontend calls service endpoints** - 
+- [x] **Node.js/Express HTTP service** - I use node.js and express
+- [x] **Static middleware for frontend** - public files expressed using express
+- [x] **Calls to third party endpoints** - 3rd party jokes and random facts indluded in competitor sreen
+- [x] **Frontend calls service endpoints** - 
 forntend fetches and displays backend data such as obtaining ring numbers, match numbers and scores which it then shows the competitor.
+
+
 ## 🚀 DB/Login deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.

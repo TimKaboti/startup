@@ -249,11 +249,6 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/update-score', (r
 
 
 
-
-const port = process.argv.length > 2 ? process.argv[2] : 4000;
-app.listen(port, () => console.log(`Server running on port ${port}`));
-
-
 // 🔹 GET /api/events/:eventId/competitor/:competitorId/matches - Fetch matches for a competitor
 app.get('/api/events/:eventId/competitor/:competitorId/matches', (req, res) => {
     const { eventId, competitorId } = req.params;
@@ -271,4 +266,7 @@ app.get('/api/events/:eventId/competitor/:competitorId/matches', (req, res) => {
     res.status(200).json(competitorMatches);
 });
 
+
+const port = process.argv.length > 2 ? process.argv[2] : 4000;
+app.listen(port, () => console.log(`Server running on port ${port}`));
 
