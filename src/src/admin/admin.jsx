@@ -220,6 +220,44 @@ export function Admin() {
     };
 
 
+    const markMatchAsCompleted = async (ringId, matchId) => {
+        try {
+            console.log(`🔵 Marking match ${matchId} in ring ${ringId} as completed...`);
+
+            const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches/${matchId}/mark-completed`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("❌ Error marking match as completed:", errorData.message);
+                return;
+            }
+
+            console.log(`✅ Match ${matchId} marked as completed!`);
+
+            // 🔥 Update match status in state
+            setRings(prevRings =>
+                prevRings.map(ring =>
+                    ring.id === ringId
+                        ? {
+                            ...ring,
+                            matches: ring.matches.map(match =>
+                                match.id === matchId ? { ...match, status: "completed" } : match
+                            ),
+                        }
+                        : ring
+                )
+            );
+
+        } catch (error) {
+            console.error("❌ Error marking match as completed:", error);
+        }
+    };
+
+
+
     return (
         <main>
             <div className="main_info" style={{ fontFamily: 'Exo' }}>
@@ -274,6 +312,23 @@ export function Admin() {
                                             className="mark-ongoing-btn"
                                         >
                                             Mark as Ongoing
+                                        </button>
+                                        {/* 🔹 Button to mark match as completed */}
+                                        <button
+                                            onClick={() => {
+                                                handleMarkMatchCompleted(selectedRingId, match.id);
+
+                                                // 🔥 Temporary shading effect for 1 second
+                                                const buttonElement = document.getElementById(`complete-btn-${match.id}`);
+                                                if (buttonElement) {
+                                                    buttonElement.classList.add("clicked");
+                                                    setTimeout(() => buttonElement.classList.remove("clicked"), 1000);
+                                                }
+                                            }}
+                                            id={`complete-btn-${match.id}`}
+                                            className="complete-button"
+                                        >
+                                            Mark Completed
                                         </button>
 
                                         {match.competitors.map((competitor) => (

@@ -91,6 +91,10 @@ export function Competitor() {
                                     <td>
                                         {match.status === "ongoing" ? (
                                             <span className="status ongoing">Ongoing</span>
+                                        ) : match.status === "completed" ? (
+                                            <span className="status completed" style={{ backgroundColor: "blue", color: "white", padding: "5px", borderRadius: "5px" }}>
+                                                ✅ Match Completed
+                                            </span>
                                         ) : (
                                             <span className="status upcoming">
                                                 Upcoming: #{getMatchPosition(match.id, match.ringId)} in queue

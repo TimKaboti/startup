@@ -238,3 +238,11 @@ fieldset legend {
     background-color: #ffcc00;
     color: black;
 }
+
+.status.completed {
+    background-color: blue;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+}
