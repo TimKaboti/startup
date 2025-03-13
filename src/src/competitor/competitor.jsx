@@ -9,6 +9,9 @@ export function Competitor() {
     const [isInfoOpen, setIsInfoOpen] = useState(false); // 🔥 State for dropdown
     const location = useLocation();
     const eventName = location.state?.eventName;
+    const [randomJoke, setRandomJoke] = useState('');
+    const [randomFact, setRandomFact] = useState('');
+
 
     const getMatchPosition = (matchId, ringId) => {
         const ringMatches = matches.filter(m => m.ringId === ringId);
@@ -54,6 +57,30 @@ export function Competitor() {
             fetchCompetitorMatches();
         }
     }, [competitor.id, eventId]);
+
+
+    useEffect(() => {
+        // Fetch a random joke
+        fetch("https://v2.jokeapi.dev/joke/Any?type=single")
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.joke) {
+                    setRandomJoke(data.joke);
+                }
+            })
+            .catch((error) => console.error("❌ Error fetching joke:", error));
+
+        // Fetch a random fact
+        fetch("https://uselessfacts.jsph.pl/random.json?language=en")
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.text) {
+                    setRandomFact(data.text);
+                }
+            })
+            .catch((error) => console.error("❌ Error fetching fact:", error));
+    }, []); // Empty dependency array ensures it runs once on page load
+
 
     return (
         <div className="Events">
@@ -113,10 +140,13 @@ export function Competitor() {
                 <p>No matches assigned yet.</p>
             )}
 
-            {/* 🔹 Scoring Box */}
-            <div className="scoring">
-                <p>Scores will be updated live during the event.</p>
+            {/* 🔹 Random Joke and Fact Section */}
+            <div className="fun-facts">
+                <h3>Need a Break?</h3>
+                {randomJoke && <p><strong>😂 Joke:</strong> {randomJoke}</p>}
+                {randomFact && <p><strong>💡 Fun Fact:</strong> {randomFact}</p>}
             </div>
+
         </div>
     );
 }
