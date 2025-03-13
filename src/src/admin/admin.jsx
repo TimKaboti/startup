@@ -8,8 +8,8 @@ export function Admin() {
     const [competitors, setCompetitors] = useState([]);
     const [selectedCompetitor, setSelectedCompetitor] = useState('');
     const [selectedRingId, setSelectedRingId] = useState(null);
+    const [tempScores, setTempScores] = useState({});
 
-    // 🔥 Fetch rings from backend
     useEffect(() => {
         const fetchRings = async () => {
             try {
@@ -17,8 +17,6 @@ export function Admin() {
                 if (response.ok) {
                     const data = await response.json();
                     setRings(data);
-                } else {
-                    console.error("❌ Error fetching rings:", response.statusText);
                 }
             } catch (error) {
                 console.error("❌ Fetch rings error:", error);
@@ -27,31 +25,24 @@ export function Admin() {
         fetchRings();
     }, [eventId]);
 
-    // 🔥 Fetch competitors for this event
     useEffect(() => {
         const fetchCompetitors = async () => {
             try {
-                console.log("🔍 Fetching competitors for event:", eventId);
                 const response = await fetch(`/api/events/${eventId}/competitors`);
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("✅ Competitors fetched:", data);
                     setCompetitors(data);
-                } else {
-                    console.error("❌ Error fetching competitors:", response.statusText);
                 }
             } catch (error) {
                 console.error("❌ Fetch competitors error:", error);
             }
         };
-
         fetchCompetitors();
     }, [eventId]);
 
-    // 🔹 Add a new ring
     const addRing = async () => {
         try {
-            console.log("🛠️ Attempting to add a new ring for event:", eventId);
+            console.log(`🔍 Sending request to create a new ring for event ${eventId}...`);
 
             const response = await fetch(`/api/events/${eventId}/rings`, {
                 method: 'POST',
@@ -66,13 +57,16 @@ export function Admin() {
 
             const newRing = await response.json();
             console.log("✅ Ring added successfully:", newRing);
-            setRings([...rings, newRing]); // 🔥 Append new ring to state
+
+            // 🔥 Update UI with new ring from backend
+            setRings(prevRings => [...prevRings, newRing]);
+
         } catch (error) {
             console.error("❌ Error adding ring:", error);
         }
     };
 
-    // 🔹 Add a new match to a ring
+
     const addMatch = async (ringId) => {
         try {
             console.log(`🛠️ Adding match to ring ${ringId} in event ${eventId}`);
@@ -91,6 +85,7 @@ export function Admin() {
             const newMatch = await response.json();
             console.log("✅ Match added successfully:", newMatch);
 
+            // 🔥 Update UI state
             setRings(prevRings => prevRings.map(ring =>
                 ring.id === ringId ? { ...ring, matches: [...(ring.matches || []), newMatch] } : ring
             ));
@@ -99,12 +94,18 @@ export function Admin() {
         }
     };
 
-    // 🔹 Add a competitor to a match
+
     const addCompetitorToMatch = async (ringId, matchId, competitor) => {
+        if (!ringId || !matchId) {
+            console.error("❌ Cannot add competitor, missing ring or match ID!");
+            return;
+        }
+
         try {
-            console.log(`🛠️ Adding competitor to match ${matchId} in ring ${ringId}`);
+            console.log(`🔹 Adding ${competitor.name} to match ${matchId} in ring ${ringId}...`);
 
             const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches/${matchId}/add-competitor`, {
+
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ competitor }),
@@ -119,7 +120,6 @@ export function Admin() {
             const updatedMatch = await response.json();
             console.log('✅ Competitor added to match:', updatedMatch);
 
-            // 🔥 Update local state immediately
             setRings(prevRings =>
                 prevRings.map(ring =>
                     ring.id === ringId
@@ -137,10 +137,12 @@ export function Admin() {
         }
     };
 
+
     return (
         <main>
             <div className="main_info" style={{ fontFamily: 'Exo' }}>
                 <h2>RINGS for Event {eventId}</h2>
+                <button onClick={addRing}>Add Ring</button>
                 <div className="tab-container">
                     {rings.map((ring) => (
                         <div key={ring.id} className="ring-button-container">
@@ -157,25 +159,51 @@ export function Admin() {
                     <div className="ring-details">
                         <h3>Details for Ring {selectedRingId}</h3>
                         <button onClick={() => addMatch(selectedRingId)}>Add Match</button>
-                        <h4>Matches</h4>
                         {rings.find(ring => ring.id === selectedRingId)?.matches?.map((match) => (
                             <div key={match.id} className="match">
                                 <h5>Match {match.id}</h5>
-
-                                {/* 🔥 Display competitors in the match */}
-                                <h4>Competitors in this Match</h4>
+                                <label>Select Competitor:</label>
+                                <select
+                                    value={selectedCompetitor}
+                                    onChange={(e) => setSelectedCompetitor(e.target.value)}
+                                >
+                                    <option value="">Select a Competitor</option>
+                                    {competitors.map((competitor) => (
+                                        <option key={competitor.id} value={JSON.stringify(competitor)}>
+                                            {competitor.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <button
+                                    onClick={() => {
+                                        if (selectedCompetitor) {
+                                            const competitorData = JSON.parse(selectedCompetitor);
+                                            addCompetitorToMatch(selectedRingId, match.id, competitorData);
+                                            setSelectedCompetitor('');
+                                        }
+                                    }}
+                                >
+                                    Add Competitor
+                                </button>
                                 {match.competitors.length > 0 ? (
                                     <div>
                                         {match.competitors.map((competitor) => (
-                                            <div key={competitor.id} className="competitor-row">
+                                            <div key={`${match.id}-${competitor.id}`} className="competitor-row">
                                                 <span className="competitor-name">{competitor.name}</span>
-                                                <input style={{ width: 150 }}
-                                                    type="text"  // ✅ Allows text-based score input
+                                                <input
+                                                    type="text"
                                                     className="score-input"
-                                                    value={competitor.score || ""}
-                                                    onChange={(e) =>
-                                                        updateCompetitorScore(selectedRingId, match.id, competitor.id, e.target.value)
-                                                    }
+                                                    value={tempScores[`${match.id}-${competitor.id}`] ?? competitor.score ?? ""}
+                                                    onChange={(e) => {
+                                                        const newScore = e.target.value;
+                                                        setTempScores(prevScores => ({
+                                                            ...prevScores,
+                                                            [`${match.id}-${competitor.id}`]: newScore,
+                                                        }));
+                                                    }}
+                                                    onBlur={() => {
+                                                        console.log("Submitting score update...");
+                                                    }}
                                                     placeholder="Enter Score"
                                                 />
                                             </div>
@@ -184,39 +212,10 @@ export function Admin() {
                                 ) : (
                                     <p>No competitors in this match yet.</p>
                                 )}
-
-
-                                {/* Competitor Dropdown */}
-                                <div>
-                                    <label>Select Competitor:</label>
-                                    <select
-                                        value={selectedCompetitor}
-                                        onChange={(e) => setSelectedCompetitor(e.target.value)}
-                                    >
-                                        <option value="">Select a Competitor</option>
-                                        {competitors.map((competitor) => (
-                                            <option key={competitor.id} value={JSON.stringify(competitor)}>
-                                                {competitor.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <button
-                                        onClick={() => {
-                                            if (selectedCompetitor) {
-                                                const competitorData = JSON.parse(selectedCompetitor);
-                                                addCompetitorToMatch(selectedRingId, match.id, competitorData);
-                                                setSelectedCompetitor('');
-                                            }
-                                        }}
-                                    >
-                                        Add Competitor
-                                    </button>
-                                </div>
                             </div>
                         ))}
                     </div>
                 )}
-                <button onClick={addRing}>Add Ring</button>
             </div>
         </main>
     );

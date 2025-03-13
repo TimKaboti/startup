@@ -86,10 +86,16 @@ app.get('/api/events/:id/competitors', (req, res) => {
 app.post('/api/events/:eventId/rings', (req, res) => {
     const event = events.find(e => e.id === parseInt(req.params.eventId));
     if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    if (!event.rings) {
+        event.rings = [];  // ✅ Initialize rings if missing
+    }
+
     const newRing = { id: event.rings.length + 1, matches: [] };
     event.rings.push(newRing);
     res.status(201).json(newRing);
 });
+
 
 app.get('/api/events/:eventId/rings', (req, res) => {
     const event = events.find(e => e.id === parseInt(req.params.eventId));
@@ -97,21 +103,10 @@ app.get('/api/events/:eventId/rings', (req, res) => {
     res.status(200).json(event.rings);
 });
 
-// Match management
-app.post('/api/events/:eventId/rings/:ringId/matches', (req, res) => {
-    const event = events.find(e => e.id === parseInt(req.params.eventId));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
-    const ring = event.rings.find(r => r.id === parseInt(req.params.ringId));
-    if (!ring) return res.status(404).json({ message: 'Ring not found' });
-    const newMatch = { id: ring.matches.length + 1, competitors: [], status: "upcoming" };
-    ring.matches.push(newMatch);
-    res.status(201).json(newMatch);
-});
 
-// 🔹 PATCH: Add a competitor to a match
-app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', (req, res) => {
-    const { eventId, ringId, matchId } = req.params;
-    const { competitor } = req.body;
+// 🔹 GET Matches in a Specific Ring
+app.get('/api/events/:eventId/rings/:ringId/matches', (req, res) => {
+    const { eventId, ringId } = req.params;
 
     const event = events.find(event => event.id === parseInt(eventId));
     if (!event) return res.status(404).json({ message: 'Event not found' });
@@ -119,19 +114,71 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', 
     const ring = event.rings.find(r => r.id === parseInt(ringId));
     if (!ring) return res.status(404).json({ message: 'Ring not found' });
 
-    const match = ring.matches.find(m => m.id === parseInt(matchId));
-    if (!match) return res.status(404).json({ message: 'Match not found' });
+    res.status(200).json(ring.matches);
+});
 
-    // 🔥 Check if competitor is already in THIS SPECIFIC MATCH in THIS RING
-    if (match.competitors.some(c => c.email === competitor.email)) {
-        return res.status(400).json({ message: 'Competitor already in this match in this ring' });
+
+// Match management
+app.post('/api/events/:eventId/rings/:ringId/matches', (req, res) => {
+    const event = events.find(e => e.id === parseInt(req.params.eventId));
+    if (!event) {
+        console.log(`❌ Event ${req.params.eventId} NOT FOUND`);
+        return res.status(404).json({ message: 'Event not found' });
     }
 
-    console.log(`✅ Adding competitor ${competitor.name} to match ${matchId} in ring ${ringId}`);
+    const ring = event.rings.find(r => r.id === parseInt(req.params.ringId));
+    if (!ring) {
+        console.log(`❌ Ring ${req.params.ringId} NOT FOUND in Event ${req.params.eventId}`);
+        return res.status(404).json({ message: 'Ring not found' });
+    }
+
+    console.log(`✅ Found Ring ${req.params.ringId}, adding a new match...`);
+
+    const newMatch = { id: ring.matches.length + 1, competitors: [], status: "upcoming" };
+    ring.matches.push(newMatch);
+
+    console.log(`✅ Match ${newMatch.id} successfully added to Ring ${req.params.ringId}`);
+    res.status(201).json(newMatch);
+});
+
+
+
+// 🔹 PATCH: Add a competitor to a match
+app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', (req, res) => {
+    const { eventId, ringId, matchId } = req.params;
+    const { competitor } = req.body;
+
+    const event = events.find(event => event.id === parseInt(eventId));
+    if (!event) {
+        console.log(`❌ Event ${eventId} NOT FOUND`);
+        return res.status(404).json({ message: 'Event not found' });
+    }
+
+    console.log(`✅ Found Event ${eventId}, Rings:`, event.rings);
+
+    const ring = event.rings.find(r => r.id === parseInt(ringId));
+    if (!ring) {
+        console.log(`❌ Ring ${ringId} NOT FOUND in event ${eventId}`);
+        return res.status(404).json({ message: 'Ring not found' });
+    }
+
+    console.log(`✅ Found Ring ${ringId}, Matches:`, ring.matches);
+
+    const match = ring.matches.find(m => m.id === parseInt(matchId));
+    if (!match) {
+        console.log(`❌ Match ${matchId} NOT FOUND in Ring ${ringId}`);
+        return res.status(404).json({ message: 'Match not found' });
+    }
+
+    console.log(`✅ Found Match ${matchId}, adding competitor...`, competitor);
 
     match.competitors.push(competitor);
     res.status(200).json(match);
 });
+
+
+
+
 
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
