@@ -18,7 +18,7 @@ export default function App() {
                 <Route path="/events" element={<MainLayout><Events /></MainLayout>} />
                 <Route path="/about" element={<MainLayout><About /></MainLayout>} />
                 <Route path="/admin/:eventId" element={<MainLayout><Admin /></MainLayout>} />
-                <Route path="/competitor/:eventId" element={<Competitor />} />
+                <Route path="/competitor/:eventId" element={<MainLayout><Competitor /></MainLayout>} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </BrowserRouter>

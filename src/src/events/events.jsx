@@ -74,7 +74,7 @@ export function Events() {
 
         console.log("🔹 User attempting to join:", user);
         console.log("🔹 Selected event ID:", selectedEvent);
-        console.log("🔹 Detected user role:", user.role); // ✅ Log the role
+        console.log("🔹 Detected user role:", user.role);
 
         if (!user.role) {
             console.warn("⚠️ User role not found, defaulting to competitor");
@@ -90,24 +90,22 @@ export function Events() {
                 body: JSON.stringify({ user }),
             });
 
-            console.log("🔹 Response from join API:", response);
+            const responseData = await response.json();
+            console.log("🔹 Response JSON:", responseData);
 
-            let responseData;
-            try {
-                responseData = await response.json();
-                console.log("🔹 Response JSON:", responseData);
-            } catch (err) {
-                console.error("❌ Failed to parse JSON response:", err);
-                responseData = { message: "Unknown error" };
+            if (!response.ok) {
+                console.error("❌ Error joining event:", responseData.message);
+                alert(responseData.message);
+                return;
             }
 
-            // 🔥 Ensure correct role-based redirection
-            let redirectPath;
-            if (user.role === 'competitor') {
-                redirectPath = `/competitor/${selectedEvent}`;
-            } else {
-                redirectPath = `/admin/${selectedEvent}`;
-            }
+            // 🔥 Always update sessionStorage with eventId, even if user already joined
+            const updatedUser = { ...user, eventId: selectedEvent };
+            sessionStorage.setItem('loggedInUser', JSON.stringify(updatedUser));
+            console.log("✅ Updated loggedInUser in sessionStorage:", updatedUser);
+
+            // 🔥 Redirect user to the correct page
+            let redirectPath = user.role === 'competitor' ? `/competitor/${selectedEvent}` : `/admin/${selectedEvent}`;
 
             console.log(`🔄 Navigating to ${redirectPath}...`);
             navigate(redirectPath, { replace: true });
@@ -123,6 +121,8 @@ export function Events() {
             alert(error.message);
         }
     };
+
+
 
 
     const handleCreateEvent = async (e) => {

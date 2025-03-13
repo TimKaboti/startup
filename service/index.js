@@ -56,14 +56,25 @@ app.get('/api/events', (req, res) => res.status(200).json(events));
 app.patch('/api/events/:id/join', (req, res) => {
     const { id } = req.params;
     const { user } = req.body;
-    const event = events.find(e => e.id === parseInt(id));
+
+    const event = events.find(event => event.id === parseInt(id));
     if (!event) return res.status(404).json({ message: 'Event not found' });
-    if (event.participants.some(p => p.email === user.email)) {
-        return res.status(400).json({ message: 'User is already in this event' });
+
+    // 🔥 Check if the user is already in the event
+    const existingParticipant = event.participants.find(p => p.email === user.email);
+
+    if (existingParticipant) {
+        console.log(`🔹 ${user.name} is already in event ${id}, allowing rejoin.`);
+        return res.status(200).json({ message: 'User already in event', eventId: id });
     }
+
+    // 🔹 Add user if they are not already in the event
     event.participants.push(user);
-    res.status(200).json(event);
+    console.log(`✅ ${user.name} joined event ${id}`);
+
+    res.status(200).json({ message: 'User joined successfully', eventId: id });
 });
+
 
 app.get('/api/events/:id/competitors', (req, res) => {
     const event = events.find(e => e.id === parseInt(req.params.id));
@@ -135,12 +146,12 @@ app.get('/api/events/:eventId/competitor/:competitorId/matches', (req, res) => {
         return res.status(404).json({ message: "Event not found" });
     }
 
-    // 🔥 Find all matches where this competitor is assigned
+    // Find all matches where this competitor is assigned
     const competitorMatches = event.rings
-        .flatMap(ring => ring.matches)
+        .flatMap(ring => ring.matches.map(match => ({ ...match, ringId: ring.id }))) // 🔥 Add ringId
         .filter(match => match.competitors.some(c => c.id === parseInt(competitorId)));
 
-    console.log(`✅ Returning matches for competitor ${competitorId}:`, competitorMatches);
     res.status(200).json(competitorMatches);
 });
+
 

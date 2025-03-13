@@ -169,7 +169,7 @@ export function Admin() {
                                         {match.competitors.map((competitor) => (
                                             <div key={competitor.id} className="competitor-row">
                                                 <span className="competitor-name">{competitor.name}</span>
-                                                <input
+                                                <input style={{ width: 150 }}
                                                     type="text"  // ✅ Allows text-based score input
                                                     className="score-input"
                                                     value={competitor.score || ""}

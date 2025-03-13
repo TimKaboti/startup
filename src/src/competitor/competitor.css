@@ -1,27 +1,48 @@
-/* @font-face {
-    font-family: Exo;
-    src: url(fonts/Exo-Italic-VariableFont_wght.ttf);
+/* Center the match table */
+.match-table {
+    width: 80%;
+    /* Adjust width as needed */
+    margin: 20px auto;
+    /* 🔥 Centers the table */
+    border-collapse: collapse;
+    /* Ensures consistent spacing */
 }
 
-@font-face {
-    font-family: ContrailOne-Regular;
-    src: url(fonts/ContrailOne-Regular.ttf);
+/* Add spacing between rows */
+.match-table tr {
+    border-bottom: 2px solid #ddd;
+    /* 🔥 Adds space and a subtle separator */
+    height: 50px;
+    /* 🔥 Increases row height */
 }
 
-html,
-body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background-image: url('blue-sides.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+/* Style table headers for clarity */
+.match-table th {
+    background-color: #444;
+    /* Dark background */
+    color: white;
+    padding: 10px;
 }
 
-*/
-.title-container {
+/* ✅ Center the entire match section */
+.match-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 🔥 Centers horizontally */
+    justify-content: center;
+    width: 100%;
+}
+
+/* Style table cells for better spacing */
+.match-table td {
+    padding: 15px;
+    text-align: center;
+    background-color: rgba(0, 26, 255, 0.6);
+}
+
+
+*/ .title-container {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -95,8 +116,10 @@ body {
     box-shadow: 7px 7px 7px rgba(1, 1, 1, .3);
     border-radius: 3px;
     font-family: Exo;
-
+    margin-top: 20px;
+    /* 🔥 Adds space below the header */
 }
+
 
 .Events table {
     border-radius: 3px;
@@ -140,20 +163,20 @@ fieldset p {
     background-color: white;
 }
 
+/* ✅ Center the scoring section */
 .scoring {
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 🔥 Ensures centering */
+    justify-content: center;
+    text-align: center;
+    margin: 20px auto;
+    width: fit-content;
+    padding: 10px;
     background-color: white;
     border-radius: 5px;
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    width: fit-content;
-    white-space: pre-line;
-    margin: 4px;
-    margin-top: 10px;
-    padding: 5px 10px;
-    transform: translateX(-0%);
 }
 
 fieldset legend {
