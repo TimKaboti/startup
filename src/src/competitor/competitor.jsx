@@ -10,6 +10,13 @@ export function Competitor() {
     const location = useLocation();
     const eventName = location.state?.eventName;
 
+    const getMatchPosition = (matchId, ringId) => {
+        const ringMatches = matches.filter(m => m.ringId === ringId);
+        const matchIndex = ringMatches.findIndex(m => m.id === matchId);
+        return matchIndex !== -1 ? matchIndex + 1 : "N/A";
+    };
+
+
     useEffect(() => {
         // 🔥 Get logged-in competitor details
         const storedCompetitor = JSON.parse(sessionStorage.getItem('loggedInUser'));
@@ -81,7 +88,16 @@ export function Competitor() {
                                 <tr key={match.id}>
                                     <td>{match.ringId || "N/A"}</td>
                                     <td>{match.id}</td>
-                                    <td>{match.status === "ongoing" ? "Ongoing" : "Upcoming"}</td>
+                                    <td>
+                                        {match.status === "ongoing" ? (
+                                            <span className="status ongoing">Ongoing</span>
+                                        ) : (
+                                            <span className="status upcoming">
+                                                Upcoming: #{getMatchPosition(match.id, match.ringId)} in queue
+                                            </span>
+                                        )}
+                                    </td>
+
                                     <td>{match.competitors.find(c => c.id === competitor.id)?.score || "N/A"}</td>
                                 </tr>
                             ))}

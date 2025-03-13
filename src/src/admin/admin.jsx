@@ -183,6 +183,42 @@ export function Admin() {
     };
 
 
+    const markMatchAsOngoing = async (ringId, matchId) => {
+        try {
+            console.log(`🔹 Marking Match ${matchId} in Ring ${ringId} as Ongoing...`);
+
+            const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches/${matchId}/mark-ongoing`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("❌ Error marking match as ongoing:", errorData.message);
+                return;
+            }
+
+            const updatedMatch = await response.json();
+            console.log("✅ Match marked as ongoing:", updatedMatch);
+
+            // 🔥 Update UI state
+            setRings(prevRings =>
+                prevRings.map(ring =>
+                    ring.id === ringId
+                        ? {
+                            ...ring,
+                            matches: ring.matches.map(match =>
+                                match.id === matchId ? updatedMatch : { ...match, status: "upcoming" }
+                            ),
+                        }
+                        : ring
+                )
+            );
+        } catch (error) {
+            console.error("❌ Error updating match status:", error);
+        }
+    };
+
 
     return (
         <main>
@@ -233,6 +269,13 @@ export function Admin() {
                                 </button>
                                 {match.competitors.length > 0 ? (
                                     <div>
+                                        <button
+                                            onClick={() => markMatchAsOngoing(selectedRingId, match.id)}
+                                            className="mark-ongoing-btn"
+                                        >
+                                            Mark as Ongoing
+                                        </button>
+
                                         {match.competitors.map((competitor) => (
                                             <div key={`${match.id}-${competitor.id}`} className="competitor-row">
                                                 <span className="competitor-name">{competitor.name}</span>

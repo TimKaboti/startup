@@ -120,6 +120,7 @@
     font-family: Exo;
     margin-top: 20px;
     /* 🔥 Adds space below the header */
+    justify-self: center;
 }
 
 
@@ -221,7 +222,19 @@ fieldset legend {
     border: 2px solid blue;
 }
 
-/*
-footer {
-    margin-top: 20px;
-} */
+
+.status {
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 5px;
+}
+
+.ongoing {
+    background-color: #ff5555;
+    color: white;
+}
+
+.upcoming {
+    background-color: #ffcc00;
+    color: black;
+}

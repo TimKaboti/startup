@@ -143,6 +143,29 @@ app.post('/api/events/:eventId/rings/:ringId/matches', (req, res) => {
 
 
 
+app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', (req, res) => {
+    const { eventId, ringId, matchId } = req.params;
+
+    const event = events.find(event => event.id === parseInt(eventId));
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    const ring = event.rings.find(ring => ring.id === parseInt(ringId));
+    if (!ring) return res.status(404).json({ message: 'Ring not found' });
+
+    const match = ring.matches.find(match => match.id === parseInt(matchId));
+    if (!match) return res.status(404).json({ message: 'Match not found' });
+
+    // 🔹 Mark all other matches as upcoming
+    ring.matches.forEach(m => m.status = "upcoming");
+
+    // 🔥 Mark the selected match as "ongoing"
+    match.status = "ongoing";
+    console.log(`✅ Match ${matchId} in Ring ${ringId} marked as Ongoing.`);
+
+    res.status(200).json(match);
+});
+
+
 // 🔹 PATCH: Add a competitor to a match
 app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', (req, res) => {
     const { eventId, ringId, matchId } = req.params;

@@ -148,6 +148,22 @@ button:hover {
     border-radius: 5px;
 }
 
+.mark-ongoing-btn {
+    background-color: #ff5555;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.mark-ongoing-btn:hover {
+    background-color: #cc4444;
+}
+
+
 /*
 #add-ring-btn {
     position: absolute;
@@ -158,67 +174,4 @@ button:hover {
 
 .main_info h2 {
     text-align: center;
-}
-
-.rings {
-    background-color: rgb(186, 183, 183);
-}
-
-.ring-button {
-    margin: 5px;
-    padding: 10px;
-    font-size: 16px;
-    background-color: lightblue;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.dropdown-container {
-    margin-top: 5px;
-    padding: 10px;
-    background-color: lightgray;
-    border-radius: 5px;
-    display: none;
-}
-
-.dropdown-container p {
-    font-size: 14px;
-}
-
-#rings-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.ring {
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    background-color: #f9f9f9;
-    width: 200px;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
-    display: none;
-}
-
-.ring-content {
-    display: none;
-}
-
-.ring.active .ring-content {
-    display: block;
-}
-
-.ring.selected {
-    display: block;
-}
-
-.ring.selected h3 {
-    background-color: #4CAF50;
-    color: white;
 }
