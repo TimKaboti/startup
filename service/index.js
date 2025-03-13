@@ -178,6 +178,33 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', 
 
 
 
+// 🔹 PATCH: Update a competitor's score in a match
+app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/update-score', (req, res) => {
+    const { eventId, ringId, matchId } = req.params;
+    const { competitorId, score } = req.body;
+
+    console.log(`🔍 Updating score for Competitor ${competitorId} in Match ${matchId}, Ring ${ringId}`);
+
+    const event = events.find(event => event.id === parseInt(eventId));
+    if (!event) return res.status(404).json({ message: 'Event not found' });
+
+    const ring = event.rings.find(ring => ring.id === parseInt(ringId));
+    if (!ring) return res.status(404).json({ message: 'Ring not found' });
+
+    const match = ring.matches.find(match => match.id === parseInt(matchId));
+    if (!match) return res.status(404).json({ message: 'Match not found' });
+
+    const competitor = match.competitors.find(c => c.id === parseInt(competitorId));
+    if (!competitor) return res.status(404).json({ message: 'Competitor not found in this match' });
+
+    // 🔥 Update the score
+    competitor.score = score;
+    console.log(`✅ Score Updated: Competitor ${competitorId} now has score: ${score}`);
+
+    res.status(200).json({ message: "Score updated successfully", match });
+});
+
+
 
 
 const port = process.argv.length > 2 ? process.argv[2] : 4000;

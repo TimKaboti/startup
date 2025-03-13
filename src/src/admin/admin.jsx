@@ -137,6 +137,52 @@ export function Admin() {
         }
     };
 
+    const updateCompetitorScore = async (ringId, matchId, competitorId, newScore) => {
+        try {
+            console.log(`🛠️ Updating score for competitor ${competitorId} in match ${matchId}`);
+
+            const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches/${matchId}/update-score`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ competitorId, score: newScore }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("❌ Error updating score:", errorData.message);
+                return;
+            }
+
+            console.log("✅ Score updated successfully.");
+
+            // 🔥 Refresh local state to reflect score update
+            setRings(prevRings =>
+                prevRings.map(ring =>
+                    ring.id === ringId
+                        ? {
+                            ...ring,
+                            matches: ring.matches.map(match =>
+                                match.id === matchId
+                                    ? {
+                                        ...match,
+                                        competitors: match.competitors.map(competitor =>
+                                            competitor.id === competitorId
+                                                ? { ...competitor, score: newScore }
+                                                : competitor
+                                        ),
+                                    }
+                                    : match
+                            ),
+                        }
+                        : ring
+                )
+            );
+        } catch (error) {
+            console.error("❌ Error updating score:", error);
+        }
+    };
+
+
 
     return (
         <main>
@@ -190,7 +236,7 @@ export function Admin() {
                                         {match.competitors.map((competitor) => (
                                             <div key={`${match.id}-${competitor.id}`} className="competitor-row">
                                                 <span className="competitor-name">{competitor.name}</span>
-                                                <input
+                                                <input style={{ width: 150 }}
                                                     type="text"
                                                     className="score-input"
                                                     value={tempScores[`${match.id}-${competitor.id}`] ?? competitor.score ?? ""}
@@ -202,10 +248,20 @@ export function Admin() {
                                                         }));
                                                     }}
                                                     onBlur={() => {
-                                                        console.log("Submitting score update...");
+                                                        if (tempScores[`${match.id}-${competitor.id}`] !== undefined) {
+                                                            updateCompetitorScore(selectedRingId, match.id, competitor.id, tempScores[`${match.id}-${competitor.id}`]);
+
+                                                            // ✅ Clear tempScores after sending update
+                                                            setTempScores(prevScores => {
+                                                                const updatedScores = { ...prevScores };
+                                                                delete updatedScores[`${match.id}-${competitor.id}`];
+                                                                return updatedScores;
+                                                            });
+                                                        }
                                                     }}
                                                     placeholder="Enter Score"
                                                 />
+
                                             </div>
                                         ))}
                                     </div>
