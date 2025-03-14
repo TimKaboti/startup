@@ -63,7 +63,7 @@ export function Login() {
         const newUser = { email, password, name, age, rank }; // ✅ No role selection here
 
         try {
-            const response = await fetch('http://localhost:4000/api/users', {
+            const response = await fetch('/api/users', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -267,6 +267,17 @@ app.get('/api/events/:eventId/competitor/:competitorId/matches', (req, res) => {
 });
 
 
+const path = require("path");
+
+// Serve frontend static files
+app.use(express.static(path.join(__dirname, "public")));
+
+// Handle React routes for production
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
 
