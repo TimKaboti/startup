@@ -2,6 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const app = express();
+const { connectDB, client } = require('./database'); // Import MongoDB connection
+const { getUsersCollection, getEventsCollection } = require('./database');
+const path = require("path");
+
 
 const SECRET_KEY = "your_secret_key";
 
@@ -9,24 +13,36 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-let users = [];
-let events = [];
+// let users = [];
+// let events = [];
 
 app.get('/', (req, res) => res.send('Hello, world!'));
 
 // User management
-app.post('/api/users', (req, res) => {
-    const { name, age, rank, email, password } = req.body;
-    if (!name || !age || !rank || !email || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
+app.post('/api/users', async (req, res) => {
+    try {
+        const usersCollection = getUsersCollection();
+        const { name, age, rank, email, password } = req.body;
+
+        if (!name || !age || !rank || !email || !password) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const existingUser = await usersCollection.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Email already registered' });
+        }
+
+        const newUser = { name, age, rank, email, password, role: 'competitor' };
+        const result = await usersCollection.insertOne(newUser);
+
+        res.status(201).json({ id: result.insertedId, ...newUser });
+    } catch (error) {
+        console.error("❌ Error creating user:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-    if (users.some(user => user.email === email)) {
-        return res.status(400).json({ message: 'Email already registered' });
-    }
-    const newUser = { id: users.length + 1, name, age, rank, email, password, role: 'competitor' };
-    users.push(newUser);
-    res.status(201).json(newUser);
 });
+
 
 app.get('/api/users', (req, res) => res.status(200).json(users));
 
@@ -267,7 +283,7 @@ app.get('/api/events/:eventId/competitor/:competitorId/matches', (req, res) => {
 });
 
 
-const path = require("path");
+// const path = require("path");
 
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, "public")));
@@ -278,6 +294,19 @@ app.get("*", (req, res) => {
 });
 
 
-const port = process.argv.length > 2 ? process.argv[2] : 4000;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+// ✅ Ensure MongoDB is connected BEFORE starting the server
+(async () => {
+    await connectDB(); // 🛠 Ensures database is connected
+
+    // ✅ Place `app.listen()` here, AFTER successful connection
+    const port = process.argv.length > 2 ? process.argv[2] : 4000;
+    app.listen(port, () => console.log(`🚀 Server running on port ${port}`));
+})();
+
+// ✅ Graceful Shutdown: Close DB connection on exit
+process.on('SIGINT', async () => {
+    console.log("🛑 Closing MongoDB connection...");
+    await client.close();
+    process.exit(0);
+});
 
