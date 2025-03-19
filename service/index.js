@@ -19,6 +19,8 @@ app.use(express.static('public'));
 app.get('/', (req, res) => res.send('Hello, world!'));
 
 // User management
+const bcrypt = require('bcrypt');
+
 app.post('/api/users', async (req, res) => {
     try {
         const usersCollection = getUsersCollection();
@@ -33,7 +35,11 @@ app.post('/api/users', async (req, res) => {
             return res.status(400).json({ message: 'Email already registered' });
         }
 
-        const newUser = { name, age, rank, email, password, role: 'competitor' };
+        // 🔹 Ensure password hashing is correctly applied
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log("✅ Hashed Password:", hashedPassword); // Debugging: Check if hashing works
+
+        const newUser = { name, age, rank, email, password: hashedPassword, role: 'competitor' };
         const result = await usersCollection.insertOne(newUser);
 
         res.status(201).json({ id: result.insertedId, ...newUser });
@@ -44,17 +50,46 @@ app.post('/api/users', async (req, res) => {
 });
 
 
-app.get('/api/users', (req, res) => res.status(200).json(users));
+app.get('/api/users', async (req, res) => {
+    try {
+        const usersCollection = getUsersCollection();
+        const users = await usersCollection.find({}).toArray(); // 🔹 Fetch all users
 
-app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    const user = users.find(u => u.email === email && u.password === password);
-    if (!user) {
-        return res.status(401).json({ message: 'Invalid email or password' });
+        res.status(200).json(users);
+    } catch (error) {
+        console.error("❌ Error fetching users:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-    const token = jwt.sign({ email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
-    res.status(200).json({ ...user, token });
 });
+
+
+
+app.post('/api/login', async (req, res) => {
+    try {
+        const usersCollection = getUsersCollection();
+        const { email, password } = req.body;
+
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // 🔹 Compare provided password with the hashed password in the database
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        const token = jwt.sign({ email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+
+        res.status(200).json({ ...user, token });
+    } catch (error) {
+        console.error("❌ Error during login:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 app.post('/api/logout', (req, res) => res.status(200).json({ message: "Logged out successfully" }));
 
