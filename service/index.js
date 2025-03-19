@@ -2,9 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const app = express();
-const { connectDB, client } = require('./database'); // Import MongoDB connection
+const { connectDB, client, getBlacklistedTokensCollection } = require('./database'); // Import MongoDB connection
 const { getUsersCollection, getEventsCollection } = require('./database');
 const path = require("path");
+
 
 
 const SECRET_KEY = "your_secret_key";
@@ -50,17 +51,40 @@ app.post('/api/users', async (req, res) => {
 });
 
 
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', authenticateToken, async (req, res) => {
     try {
         const usersCollection = getUsersCollection();
-        const users = await usersCollection.find({}).toArray(); // 🔹 Fetch all users
-
+        const users = await usersCollection.find({}).toArray();
         res.status(200).json(users);
     } catch (error) {
         console.error("❌ Error fetching users:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+
+
+async function authenticateToken(req, res, next) {
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({ message: "Access denied. No token provided." });
+    }
+
+    const blacklistedTokensCollection = getBlacklistedTokensCollection();
+    const blacklistedToken = await blacklistedTokensCollection.findOne({ token });
+
+    if (blacklistedToken) {
+        return res.status(403).json({ message: "Token is blacklisted. Please log in again." });
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) return res.status(403).json({ message: "Invalid token" });
+        req.user = user;
+        next();
+    });
+}
+
 
 
 
@@ -91,7 +115,26 @@ app.post('/api/login', async (req, res) => {
 });
 
 
-app.post('/api/logout', (req, res) => res.status(200).json({ message: "Logged out successfully" }));
+const { ObjectId } = require('mongodb');
+
+app.post('/api/logout', async (req, res) => {
+    try {
+        const blacklistedTokensCollection = getBlacklistedTokensCollection();
+        const token = req.headers.authorization?.split(" ")[1];
+
+        if (!token) {
+            return res.status(400).json({ message: "No token provided" });
+        }
+
+        // Store the token in the blacklist collection
+        await blacklistedTokensCollection.insertOne({ token, createdAt: new Date() });
+
+        res.status(200).json({ message: "Logged out successfully" });
+    } catch (error) {
+        console.error("❌ Error logging out:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 // Event management
 app.post('/api/events', (req, res) => {

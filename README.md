@@ -117,7 +117,7 @@ forntend fetches and displays backend data such as obtaining ring numbers, match
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **User registration** - I did not complete this part of the deliverable.
+- [x] **User registration** - users can be created and are stored in a mongo database. unique user ID generated upon user creation.
 - [ ] **User login and logout** - I did not complete this part of the deliverable.
 - [ ] **Stores data in MongoDB** - I did not complete this part of the deliverable.
 - [ ] **Stores credentials in MongoDB** - I did not complete this part of the deliverable.

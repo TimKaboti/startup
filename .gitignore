@@ -2,3 +2,4 @@ simon-css
 simon-html
 simon-react
 service/dbconfig.json
+.env

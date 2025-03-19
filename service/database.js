@@ -7,13 +7,15 @@ const client = new MongoClient(url);
 let db;
 let usersCollection;
 let eventsCollection;
+let blacklistedTokensCollection; // ✅ Added this line
 
 async function connectDB() {
     try {
         await client.connect();
-        db = client.db('tournamentDB'); // Change 'tournamentDB' to your database name
+        db = client.db('tournamentDB'); // ✅ Replace with your actual database name
         usersCollection = db.collection('users');
         eventsCollection = db.collection('events');
+        blacklistedTokensCollection = db.collection('blacklistedTokens'); // ✅ Initialize the blacklist collection
         console.log("✅ Successfully connected to MongoDB!");
     } catch (error) {
         console.error("❌ Database connection failed:", error.message);
@@ -21,9 +23,16 @@ async function connectDB() {
     }
 }
 
+// ✅ Correct function to get blacklisted tokens collection
+function getBlacklistedTokensCollection() {
+    return blacklistedTokensCollection;
+}
+
+// ✅ Single `module.exports` to avoid overwriting exports
 module.exports = {
     client,
     connectDB,
     getUsersCollection: () => usersCollection,
-    getEventsCollection: () => eventsCollection
+    getEventsCollection: () => eventsCollection,
+    getBlacklistedTokensCollection // ✅ Now correctly included in the exports
 };
