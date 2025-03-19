@@ -105,7 +105,7 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '12h' });
 
         res.status(200).json({ ...user, token });
     } catch (error) {
@@ -126,8 +126,12 @@ app.post('/api/logout', async (req, res) => {
             return res.status(400).json({ message: "No token provided" });
         }
 
-        // Store the token in the blacklist collection
-        await blacklistedTokensCollection.insertOne({ token, createdAt: new Date() });
+        // Get expiration time from the token
+        const decodedToken = jwt.decode(token);
+        const expiration = new Date(decodedToken.exp * 1000); // Convert to milliseconds
+
+        // Store the token with an expiration field
+        await blacklistedTokensCollection.insertOne({ token, createdAt: new Date(), expiresAt: expiration });
 
         res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
@@ -135,6 +139,7 @@ app.post('/api/logout', async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
 
 // Event management
 app.post('/api/events', (req, res) => {

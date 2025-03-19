@@ -16,6 +16,10 @@ async function connectDB() {
         usersCollection = db.collection('users');
         eventsCollection = db.collection('events');
         blacklistedTokensCollection = db.collection('blacklistedTokens'); // ✅ Initialize the blacklist collection
+
+        // ✅ Create a TTL index to auto-delete expired tokens
+        await blacklistedTokensCollection.createIndex({ "expiresAt": 1 }, { expireAfterSeconds: 0 });
+
         console.log("✅ Successfully connected to MongoDB!");
     } catch (error) {
         console.error("❌ Database connection failed:", error.message);
