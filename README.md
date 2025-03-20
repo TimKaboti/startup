@@ -118,7 +118,7 @@ forntend fetches and displays backend data such as obtaining ring numbers, match
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
 - [x] **User registration** - users can be created and are stored in a mongo database. unique user ID generated upon user creation.
-- [ ] **User login and logout** - I did not complete this part of the deliverable.
+- [x] **User login and logout** - Users are given a unique json webtoken upon login. the token persists for 12 hours(events can take all day), and are saved to the database. upon logout, used tokens are sent to a blacklist in the database so as to not be reused. when the 12 hour timer expires, a token will be automatically removed from said blacklist so as to prevent a buildup of unneccesary data.(login and logout functionality works).
 - [ ] **Stores data in MongoDB** - I did not complete this part of the deliverable.
 - [ ] **Stores credentials in MongoDB** - I did not complete this part of the deliverable.
 - [ ] **Restricts functionality based on authentication** - I did not complete this part of the deliverable.

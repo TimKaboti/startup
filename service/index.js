@@ -105,7 +105,7 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ email: user.email, role: user.role }, SECRET_KEY, { expiresIn: '12h' });
+        const token = jwt.sign({ email: user.email, name: user.name, role: user.role }, SECRET_KEY, { expiresIn: '12h' }); // 🔹 token expires in 12 hours
 
         res.status(200).json({ ...user, token });
     } catch (error) {
@@ -142,44 +142,124 @@ app.post('/api/logout', async (req, res) => {
 
 
 // Event management
-app.post('/api/events', (req, res) => {
-    const { name } = req.body;
-    if (!name) return res.status(400).json({ message: 'Event name is required' });
-    const newEvent = { id: events.length + 1, name, participants: [], rings: [] };
-    events.push(newEvent);
-    res.status(201).json(newEvent);
-});
+app.post('/api/events', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { name } = req.body;
 
-app.get('/api/events', (req, res) => res.status(200).json(events));
+        if (!name) {
+            return res.status(400).json({ message: 'Event name is required' });
+        }
 
-app.patch('/api/events/:id/join', (req, res) => {
-    const { id } = req.params;
-    const { user } = req.body;
+        // ✅ Get user details from the token
+        const createdBy = req.user.email; // Store the event creator
 
-    const event = events.find(event => event.id === parseInt(id));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
+        // ✅ Insert event into MongoDB with creator info
+        const newEvent = { name, createdBy, participants: [], rings: [] };
+        const result = await eventsCollection.insertOne(newEvent);
 
-    // 🔥 Check if the user is already in the event
-    const existingParticipant = event.participants.find(p => p.email === user.email);
-
-    if (existingParticipant) {
-        console.log(`🔹 ${user.name} is already in event ${id}, allowing rejoin.`);
-        return res.status(200).json({ message: 'User already in event', eventId: id });
+        res.status(201).json({ id: result.insertedId, ...newEvent });
+    } catch (error) {
+        console.error("❌ Error creating event:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-
-    // 🔹 Add user if they are not already in the event
-    event.participants.push(user);
-    console.log(`✅ ${user.name} joined event ${id}`);
-
-    res.status(200).json({ message: 'User joined successfully', eventId: id });
 });
 
 
-app.get('/api/events/:id/competitors', (req, res) => {
-    const event = events.find(e => e.id === parseInt(req.params.id));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
-    res.status(200).json(event.participants);
+app.get('/api/events', async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const events = await eventsCollection.find({}, { projection: { _id: 1, name: 1 } }).toArray();
+        res.status(200).json(events);
+    } catch (error) {
+        console.error("❌ Error fetching events:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
+
+
+app.patch('/api/events/:id/join', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { id } = req.params;
+
+        // 🔹 Validate ObjectId Format
+        if (!ObjectId.isValid(id)) {
+            console.error(`❌ Invalid ObjectId: ${id}`);
+            return res.status(400).json({ message: "Invalid event ID format" });
+        }
+
+        const eventId = new ObjectId(id); // Convert to ObjectId safely
+
+        // 🔹 Get user info from the authenticated request
+        const user = { name: req.user.name, email: req.user.email };
+
+        if (!user.email || !user.name) {
+            console.error("❌ User details missing:", user);
+            return res.status(400).json({ message: 'User details are required' });
+        }
+
+        // 🔹 Find event by ID
+        const event = await eventsCollection.findOne({ _id: eventId });
+
+        if (!event) {
+            console.error("❌ Event not found:", id);
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // 🔥 Check if user is already in the event
+        const existingParticipant = event.participants?.find(p => p.email === user.email);
+
+        if (existingParticipant) {
+            console.log(`🔹 ${user.name} is already in event ${id}, allowing rejoin.`);
+            return res.status(200).json({ message: 'User already in event', eventId: id });
+        }
+
+        // 🔹 Add user to participants array
+        await eventsCollection.updateOne(
+            { _id: eventId },
+            { $push: { participants: user } }
+        );
+
+        console.log(`✅ ${user.name} joined event ${id}`);
+        res.status(200).json({ message: 'User joined successfully', eventId: id });
+
+    } catch (error) {
+        console.error("❌ Error joining event:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
+app.get('/api/events/:id/competitors', async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { id } = req.params;
+
+        // 🔹 Validate ObjectId Format
+        if (!ObjectId.isValid(id)) {
+            console.error(`❌ Invalid ObjectId: ${id}`);
+            return res.status(400).json({ message: "Invalid event ID format" });
+        }
+
+        const eventId = new ObjectId(id);
+
+        // 🔹 Find event by ID and return only the participants field
+        const event = await eventsCollection.findOne({ _id: eventId }, { projection: { participants: 1 } });
+
+        if (!event) {
+            console.error("❌ Event not found:", id);
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        res.status(200).json(event.participants || []); // Return empty array if no participants
+
+    } catch (error) {
+        console.error("❌ Error fetching competitors:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 // Ring management
 app.post('/api/events/:eventId/rings', (req, res) => {
