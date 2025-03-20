@@ -629,49 +629,117 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', 
 
 
 // 🔹 PATCH: Update a competitor's score in a match
-app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/update-score', (req, res) => {
-    const { eventId, ringId, matchId } = req.params;
-    const { competitorId, score } = req.body;
+app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/update-score', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId, ringId, matchId } = req.params;
+        const { competitorId, score } = req.body;
 
-    console.log(`🔍 Updating score for Competitor ${competitorId} in Match ${matchId}, Ring ${ringId}`);
+        console.log(`🔍 Updating score for Competitor ${competitorId} in Match ${matchId}, Ring ${ringId}`);
 
-    const event = events.find(event => event.id === parseInt(eventId));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
+        // 🔹 Validate IDs
+        if (!ObjectId.isValid(eventId) || isNaN(ringId) || isNaN(matchId)) {
+            return res.status(400).json({ message: "Invalid event, ring, or match ID format" });
+        }
 
-    const ring = event.rings.find(ring => ring.id === parseInt(ringId));
-    if (!ring) return res.status(404).json({ message: 'Ring not found' });
+        const eventObjectId = new ObjectId(eventId);
+        const ringNumber = parseInt(ringId);
+        const matchNumber = parseInt(matchId);
 
-    const match = ring.matches.find(match => match.id === parseInt(matchId));
-    if (!match) return res.status(404).json({ message: 'Match not found' });
+        // 🔹 Fetch event
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
 
-    const competitor = match.competitors.find(c => c.id === parseInt(competitorId));
-    if (!competitor) return res.status(404).json({ message: 'Competitor not found in this match' });
+        if (!event) {
+            console.error("❌ Event not found:", eventId);
+            return res.status(404).json({ message: "Event not found" });
+        }
 
-    // 🔥 Update the score
-    competitor.score = score;
-    console.log(`✅ Score Updated: Competitor ${competitorId} now has score: ${score}`);
+        // 🔹 Ensure user is an admin or the event creator
+        if (req.user.role !== "admin" && event.createdBy !== req.user.email) {
+            return res.status(403).json({ message: "Access denied. Only admins or event creators can update scores." });
+        }
 
-    res.status(200).json({ message: "Score updated successfully", match });
+        // 🔹 Find the ring within the event
+        const ringIndex = event.rings.findIndex(r => r.id === ringNumber);
+        if (ringIndex === -1) {
+            return res.status(404).json({ message: "Ring not found" });
+        }
+
+        // 🔹 Find the match within the ring
+        const matchIndex = event.rings[ringIndex].matches.findIndex(m => m.id === matchNumber);
+        if (matchIndex === -1) {
+            return res.status(404).json({ message: "Match not found" });
+        }
+
+        // 🔹 Find the competitor within the match
+        const competitorIndex = event.rings[ringIndex].matches[matchIndex].competitors.findIndex(c => c.id == competitorId);
+        if (competitorIndex === -1) {
+            return res.status(404).json({ message: "Competitor not found in this match" });
+        }
+
+        // 🔥 Update competitor's score
+        const updateQuery = {
+            $set: {
+                [`rings.${ringIndex}.matches.${matchIndex}.competitors.${competitorIndex}.score`]: score
+            }
+        };
+
+        await eventsCollection.updateOne({ _id: eventObjectId }, updateQuery);
+
+        console.log(`✅ Score Updated: Competitor ${competitorId} now has score: ${score}`);
+
+        res.status(200).json({ message: "Score updated successfully" });
+
+    } catch (error) {
+        console.error("❌ Error updating score:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
+
 
 
 
 // 🔹 GET /api/events/:eventId/competitor/:competitorId/matches - Fetch matches for a competitor
-app.get('/api/events/:eventId/competitor/:competitorId/matches', (req, res) => {
-    const { eventId, competitorId } = req.params;
+app.get('/api/events/:eventId/competitor/:competitorId/matches', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId, competitorId } = req.params;
 
-    const event = events.find(event => event.id === parseInt(eventId));
-    if (!event) {
-        return res.status(404).json({ message: "Event not found" });
+        // 🔹 Validate ObjectId
+        if (!ObjectId.isValid(eventId) || !ObjectId.isValid(competitorId)) {
+            return res.status(400).json({ message: "Invalid event or competitor ID format" });
+        }
+
+        const eventObjectId = new ObjectId(eventId);
+
+        // 🔹 Fetch the event from MongoDB
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
+
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        // 🔹 Find all matches where this competitor is assigned
+        const competitorMatches = event.rings
+            .flatMap(ring =>
+                ring.matches.map(match => ({
+                    matchId: match.id,  // Include match number
+                    ringId: ring.id,    // Include ring number
+                    competitors: match.competitors,
+                    status: match.status
+                }))
+            )
+            .filter(match => match.competitors.some(c => c.id === competitorId));
+
+        res.status(200).json(competitorMatches);
+
+    } catch (error) {
+        console.error("❌ Error fetching matches for competitor:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-
-    // Find all matches where this competitor is assigned
-    const competitorMatches = event.rings
-        .flatMap(ring => ring.matches.map(match => ({ ...match, ringId: ring.id }))) // 🔥 Add ringId
-        .filter(match => match.competitors.some(c => c.id === parseInt(competitorId)));
-
-    res.status(200).json(competitorMatches);
 });
+
+
 
 
 // const path = require("path");
