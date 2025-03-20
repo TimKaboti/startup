@@ -379,107 +379,252 @@ app.get('/api/events/:eventId/rings/:ringId/matches', authenticateToken, async (
 });
 
 
-
 // Match management
-app.post('/api/events/:eventId/rings/:ringId/matches', (req, res) => {
-    const event = events.find(e => e.id === parseInt(req.params.eventId));
-    if (!event) {
-        console.log(`❌ Event ${req.params.eventId} NOT FOUND`);
-        return res.status(404).json({ message: 'Event not found' });
+app.post('/api/events/:eventId/rings/:ringId/matches', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId, ringId } = req.params;
+
+        // 🔹 Validate eventId and ringId format
+        if (!ObjectId.isValid(eventId) || isNaN(ringId)) {
+            return res.status(400).json({ message: "Invalid event or ring ID format" });
+        }
+
+        const eventObjectId = new ObjectId(eventId);
+        const ringNumber = parseInt(ringId);
+
+        // 🔹 Fetch the event
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
+
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // 🔹 Ensure user is an admin or event creator
+        if (req.user.role !== "admin" && event.createdBy !== req.user.email) {
+            return res.status(403).json({ message: "Access denied. Only admins or event creators can add matches." });
+        }
+
+        // 🔹 Find the ring within the event
+        const ringIndex = event.rings.findIndex(r => r.id === ringNumber);
+        if (ringIndex === -1) {
+            return res.status(404).json({ message: "Ring not found" });
+        }
+
+        // 🔹 Assign the next available match number in the ring
+        const newMatchId = event.rings[ringIndex].matches.length + 1;
+
+        // 🔹 Define new match
+        const newMatch = { id: newMatchId, competitors: [], status: "upcoming" };
+
+        // 🔹 Push new match into the specified ring
+        await eventsCollection.updateOne(
+            { _id: eventObjectId, "rings.id": ringNumber },
+            { $push: { "rings.$.matches": newMatch } }
+        );
+
+        console.log(`✅ Match ${newMatchId} added to Ring ${ringId} in Event ${eventId}`);
+        res.status(201).json(newMatch);
+
+    } catch (error) {
+        console.error("❌ Error adding match:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-
-    const ring = event.rings.find(r => r.id === parseInt(req.params.ringId));
-    if (!ring) {
-        console.log(`❌ Ring ${req.params.ringId} NOT FOUND in Event ${req.params.eventId}`);
-        return res.status(404).json({ message: 'Ring not found' });
-    }
-
-    console.log(`✅ Found Ring ${req.params.ringId}, adding a new match...`);
-
-    const newMatch = { id: ring.matches.length + 1, competitors: [], status: "upcoming" };
-    ring.matches.push(newMatch);
-
-    console.log(`✅ Match ${newMatch.id} successfully added to Ring ${req.params.ringId}`);
-    res.status(201).json(newMatch);
 });
 
 
+// all following need testing
+app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId, ringId, matchId } = req.params;
 
-app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', (req, res) => {
-    const { eventId, ringId, matchId } = req.params;
+        // 🔹 Validate IDs
+        if (!ObjectId.isValid(eventId) || isNaN(ringId) || isNaN(matchId)) {
+            return res.status(400).json({ message: "Invalid event, ring, or match ID format" });
+        }
 
-    const event = events.find(event => event.id === parseInt(eventId));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
+        const eventObjectId = new ObjectId(eventId);
+        const ringNumber = parseInt(ringId);
+        const matchNumber = parseInt(matchId);
 
-    const ring = event.rings.find(ring => ring.id === parseInt(ringId));
-    if (!ring) return res.status(404).json({ message: 'Ring not found' });
+        // 🔹 Fetch the event from the database
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
 
-    const match = ring.matches.find(match => match.id === parseInt(matchId));
-    if (!match) return res.status(404).json({ message: 'Match not found' });
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
 
-    // 🔹 Mark all other matches as upcoming
-    ring.matches.forEach(m => m.status = "upcoming");
+        // 🔹 Ensure user is an admin or event creator
+        if (req.user.role !== "admin" && event.createdBy !== req.user.email) {
+            return res.status(403).json({ message: "Access denied. Only admins or event creators can mark matches as ongoing." });
+        }
 
-    // 🔥 Mark the selected match as "ongoing"
-    match.status = "ongoing";
-    console.log(`✅ Match ${matchId} in Ring ${ringId} marked as Ongoing.`);
+        // 🔹 Find the correct ring
+        const ringIndex = event.rings.findIndex(r => r.id === ringNumber);
+        if (ringIndex === -1) {
+            return res.status(404).json({ message: "Ring not found" });
+        }
 
-    res.status(200).json(match);
+        // 🔹 Find the correct match
+        const matchIndex = event.rings[ringIndex].matches.findIndex(m => m.id === matchNumber);
+        if (matchIndex === -1) {
+            return res.status(404).json({ message: "Match not found" });
+        }
+
+        // 🔹 Set all matches in the ring to "upcoming"
+        event.rings[ringIndex].matches.forEach(m => (m.status = "upcoming"));
+
+        // 🔥 Mark the selected match as "ongoing"
+        event.rings[ringIndex].matches[matchIndex].status = "ongoing";
+
+        // 🔹 Update MongoDB
+        await eventsCollection.updateOne(
+            { _id: eventObjectId, "rings.id": ringNumber },
+            { $set: { "rings.$.matches": event.rings[ringIndex].matches } }
+        );
+
+        console.log(`✅ Match ${matchId} in Ring ${ringId} marked as Ongoing.`);
+        res.status(200).json(event.rings[ringIndex].matches[matchIndex]);
+
+    } catch (error) {
+        console.error("❌ Error marking match as ongoing:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
+
 
 
 // 🔹 PATCH: Mark a match as completed
-app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-completed', (req, res) => {
-    const { eventId, ringId, matchId } = req.params;
+app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-completed', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId, ringId, matchId } = req.params;
 
-    const event = events.find(event => event.id === parseInt(eventId));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
+        // 🔹 Validate IDs
+        if (!ObjectId.isValid(eventId) || isNaN(ringId) || isNaN(matchId)) {
+            return res.status(400).json({ message: "Invalid event, ring, or match ID format" });
+        }
 
-    const ring = event.rings.find(ring => ring.id === parseInt(ringId));
-    if (!ring) return res.status(404).json({ message: 'Ring not found' });
+        const eventObjectId = new ObjectId(eventId);
+        const ringNumber = parseInt(ringId);
+        const matchNumber = parseInt(matchId);
 
-    const match = ring.matches.find(match => match.id === parseInt(matchId));
-    if (!match) return res.status(404).json({ message: 'Match not found' });
+        // 🔹 Fetch the event from MongoDB
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
 
-    match.status = "completed";
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
 
-    console.log(`✅ Match ${matchId} in Ring ${ringId} marked as COMPLETED!`);
-    res.status(200).json({ message: "Match marked as completed", match });
+        // 🔹 Ensure user is an admin or event creator
+        if (req.user.role !== "admin" && event.createdBy !== req.user.email) {
+            return res.status(403).json({ message: "Access denied. Only admins or event creators can mark matches as completed." });
+        }
+
+        // 🔹 Find the ring
+        const ringIndex = event.rings.findIndex(r => r.id === ringNumber);
+        if (ringIndex === -1) {
+            return res.status(404).json({ message: "Ring not found" });
+        }
+
+        // 🔹 Find the match
+        const matchIndex = event.rings[ringIndex].matches.findIndex(m => m.id === matchNumber);
+        if (matchIndex === -1) {
+            return res.status(404).json({ message: "Match not found" });
+        }
+
+        // 🔥 Mark the match as "completed"
+        event.rings[ringIndex].matches[matchIndex].status = "completed";
+
+        // 🔹 Update MongoDB
+        await eventsCollection.updateOne(
+            { _id: eventObjectId, "rings.id": ringNumber },
+            { $set: { "rings.$.matches": event.rings[ringIndex].matches } }
+        );
+
+        console.log(`✅ Match ${matchId} in Ring ${ringId} marked as COMPLETED!`);
+        res.status(200).json({ message: "Match marked as completed", match: event.rings[ringIndex].matches[matchIndex] });
+
+    } catch (error) {
+        console.error("❌ Error marking match as completed:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
+
 
 
 // 🔹 PATCH: Add a competitor to a match
-app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', (req, res) => {
-    const { eventId, ringId, matchId } = req.params;
-    const { competitor } = req.body;
+app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId, ringId, matchId } = req.params;
+        const { competitor } = req.body;
 
-    const event = events.find(event => event.id === parseInt(eventId));
-    if (!event) {
-        console.log(`❌ Event ${eventId} NOT FOUND`);
-        return res.status(404).json({ message: 'Event not found' });
+        // 🔹 Validate eventId, ringId, and matchId
+        if (!ObjectId.isValid(eventId) || isNaN(ringId) || isNaN(matchId)) {
+            return res.status(400).json({ message: "Invalid event, ring, or match ID format" });
+        }
+
+        const eventObjectId = new ObjectId(eventId);
+        const ringNumber = parseInt(ringId);
+        const matchNumber = parseInt(matchId);
+
+        // 🔹 Fetch the event
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
+
+        if (!event) {
+            console.log(`❌ Event ${eventId} NOT FOUND`);
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        console.log(`✅ Found Event ${eventId}, Rings:`, event.rings);
+
+        // 🔹 Ensure user is an admin or event creator
+        if (req.user.role !== "admin" && event.createdBy !== req.user.email) {
+            return res.status(403).json({ message: "Access denied. Only admins or event creators can add competitors." });
+        }
+
+        // 🔹 Find the ring
+        const ringIndex = event.rings.findIndex(r => r.id === ringNumber);
+        if (ringIndex === -1) {
+            console.log(`❌ Ring ${ringId} NOT FOUND in Event ${eventId}`);
+            return res.status(404).json({ message: "Ring not found" });
+        }
+
+        console.log(`✅ Found Ring ${ringId}, Matches:`, event.rings[ringIndex].matches);
+
+        // 🔹 Find the match
+        const matchIndex = event.rings[ringIndex].matches.findIndex(m => m.id === matchNumber);
+        if (matchIndex === -1) {
+            console.log(`❌ Match ${matchId} NOT FOUND in Ring ${ringId}`);
+            return res.status(404).json({ message: "Match not found" });
+        }
+
+        console.log(`✅ Found Match ${matchId}, adding competitor...`, competitor);
+
+        // 🔹 Check if competitor is already in the match
+        const existingCompetitor = event.rings[ringIndex].matches[matchIndex].competitors.find(c => c.email === competitor.email);
+        if (existingCompetitor) {
+            return res.status(400).json({ message: "Competitor is already in the match" });
+        }
+
+        // 🔹 Add competitor to the match
+        await eventsCollection.updateOne(
+            { _id: eventObjectId, "rings.id": ringNumber },
+            { $push: { "rings.$.matches.$[match].competitors": competitor } },
+            { arrayFilters: [{ "match.id": matchNumber }] }
+        );
+
+        console.log(`✅ Competitor added to Match ${matchId} in Ring ${ringId}`);
+        res.status(200).json({ message: "Competitor added successfully" });
+
+    } catch (error) {
+        console.error("❌ Error adding competitor to match:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-
-    console.log(`✅ Found Event ${eventId}, Rings:`, event.rings);
-
-    const ring = event.rings.find(r => r.id === parseInt(ringId));
-    if (!ring) {
-        console.log(`❌ Ring ${ringId} NOT FOUND in event ${eventId}`);
-        return res.status(404).json({ message: 'Ring not found' });
-    }
-
-    console.log(`✅ Found Ring ${ringId}, Matches:`, ring.matches);
-
-    const match = ring.matches.find(m => m.id === parseInt(matchId));
-    if (!match) {
-        console.log(`❌ Match ${matchId} NOT FOUND in Ring ${ringId}`);
-        return res.status(404).json({ message: 'Match not found' });
-    }
-
-    console.log(`✅ Found Match ${matchId}, adding competitor...`, competitor);
-
-    match.competitors.push(competitor);
-    res.status(200).json(match);
 });
+
 
 
 
