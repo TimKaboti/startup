@@ -19,6 +19,9 @@ app.use(express.static('public'));
 
 app.get('/', (req, res) => res.send('Hello, world!'));
 
+const { ObjectId } = require('mongodb');
+
+
 // User management
 const bcrypt = require('bcrypt');
 
@@ -86,12 +89,10 @@ async function authenticateToken(req, res, next) {
 }
 
 
-
-
 app.post('/api/login', async (req, res) => {
     try {
         const usersCollection = getUsersCollection();
-        const { email, password } = req.body;
+        const { email, password, role } = req.body;  // 🔹 Accept role input
 
         const user = await usersCollection.findOne({ email });
 
@@ -105,17 +106,27 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ email: user.email, name: user.name, role: user.role }, SECRET_KEY, { expiresIn: '12h' }); // 🔹 token expires in 12 hours
+        // 🔥 Validate role selection
+        const validRoles = ["competitor", "admin"];
+        if (!validRoles.includes(role)) {
+            return res.status(400).json({ message: "Invalid role selection" });
+        }
 
-        res.status(200).json({ ...user, token });
+        // 🔹 Generate a JWT token with the selected role
+        const token = jwt.sign(
+            { email: user.email, name: user.name, role: role },  // Role now dynamic
+            SECRET_KEY,
+            { expiresIn: '12h' }
+        );
+
+        res.status(200).json({ ...user, role, token });
+
     } catch (error) {
         console.error("❌ Error during login:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
 
-
-const { ObjectId } = require('mongodb');
 
 app.post('/api/logout', async (req, res) => {
     try {
@@ -231,7 +242,7 @@ app.patch('/api/events/:id/join', authenticateToken, async (req, res) => {
 });
 
 
-app.get('/api/events/:id/competitors', async (req, res) => {
+app.get('/api/events/:id/competitors', authenticateToken, async (req, res) => {
     try {
         const eventsCollection = getEventsCollection();
         const { id } = req.params;
@@ -262,39 +273,111 @@ app.get('/api/events/:id/competitors', async (req, res) => {
 
 
 // Ring management
-app.post('/api/events/:eventId/rings', (req, res) => {
-    const event = events.find(e => e.id === parseInt(req.params.eventId));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
+app.post('/api/events/:eventId/rings', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId } = req.params;
+        const userEmail = req.user.email;
+        const userRole = req.user.role; // 🔥 Ensure this is correct
 
-    if (!event.rings) {
-        event.rings = [];  // ✅ Initialize rings if missing
+        console.log(`🔍 DEBUG: User Email: ${userEmail}, Role: ${userRole}`); // 🔥 Add this
+
+        const event = await eventsCollection.findOne({ _id: new ObjectId(eventId) });
+
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        // 🔹 Ensure ONLY Admins or Event Creators can add rings
+        if (userRole !== "admin" && event.createdBy !== userEmail) {
+            console.error(`❌ Unauthorized: ${userEmail} is not an admin or the event creator.`);
+            return res.status(403).json({ message: "Access denied. Only admins or event creators can add rings." });
+        }
+
+        // ✅ Create a new ring
+        const newRing = { id: event.rings.length + 1, matches: [] };
+
+        // ✅ Push the new ring into the event
+        await eventsCollection.updateOne(
+            { _id: new ObjectId(eventId) },
+            { $push: { rings: newRing } }
+        );
+
+        res.status(201).json(newRing);
+    } catch (error) {
+        console.error("❌ Error adding ring:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
-
-    const newRing = { id: event.rings.length + 1, matches: [] };
-    event.rings.push(newRing);
-    res.status(201).json(newRing);
 });
 
 
-app.get('/api/events/:eventId/rings', (req, res) => {
-    const event = events.find(e => e.id === parseInt(req.params.eventId));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
-    res.status(200).json(event.rings);
+app.get('/api/events/:eventId/rings', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId } = req.params;
+
+        // 🔹 Validate ObjectId Format
+        if (!ObjectId.isValid(eventId)) {
+            console.error(`❌ Invalid ObjectId: ${eventId}`);
+            return res.status(400).json({ message: "Invalid event ID format" });
+        }
+
+        const event = await eventsCollection.findOne(
+            { _id: new ObjectId(eventId) },
+            { projection: { rings: 1, _id: 0 } } // 🔹 Only return rings
+        );
+
+        if (!event) {
+            console.error(`❌ Event not found: ${eventId}`);
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        res.status(200).json(event.rings || []); // 🔹 Ensure an empty array if no rings exist
+    } catch (error) {
+        console.error("❌ Error fetching rings:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
 
 
 // 🔹 GET Matches in a Specific Ring
-app.get('/api/events/:eventId/rings/:ringId/matches', (req, res) => {
-    const { eventId, ringId } = req.params;
+app.get('/api/events/:eventId/rings/:ringId/matches', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { eventId, ringId } = req.params;
 
-    const event = events.find(event => event.id === parseInt(eventId));
-    if (!event) return res.status(404).json({ message: 'Event not found' });
+        // 🔹 Validate ObjectId format
+        if (!ObjectId.isValid(eventId)) {
+            console.error(`❌ Invalid Event ID: ${eventId}`);
+            return res.status(400).json({ message: "Invalid event ID format" });
+        }
 
-    const ring = event.rings.find(r => r.id === parseInt(ringId));
-    if (!ring) return res.status(404).json({ message: 'Ring not found' });
+        // 🔹 Convert eventId to ObjectId
+        const eventObjectId = new ObjectId(eventId);
 
-    res.status(200).json(ring.matches);
+        // 🔹 Find the event in MongoDB
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
+
+        if (!event) {
+            console.error("❌ Event not found:", eventId);
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // 🔹 Find the ring in the event
+        const ring = event.rings.find(r => r.id === parseInt(ringId));
+
+        if (!ring) {
+            console.error("❌ Ring not found:", ringId);
+            return res.status(404).json({ message: 'Ring not found' });
+        }
+
+        res.status(200).json(ring.matches);
+    } catch (error) {
+        console.error("❌ Error fetching matches:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
 });
+
 
 
 // Match management
