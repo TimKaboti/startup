@@ -41,3 +41,7 @@ Memoizing expensive calculations	useMemo
 Optimizing function references	    useCallback
 Complex state logic	                useReducer
 Reusing logic across components	    Create a custom hook
+
+
+
+in index.js I have a secret key. it currently has a dummy value. it will need to be given a new value and moved to a more secure location at some point.
