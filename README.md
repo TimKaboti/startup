@@ -92,7 +92,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [x] **Bundled using Vite** - vite installed.
 - [x] **Components** - all pages recreated in jsx files sompatible with react.
-- [x] **Router** - Routes create for all pages.
+- [x] **Router** - Routes created for all pages.
 
 ## 🚀 React part 2: Reactivity
 
@@ -108,7 +108,7 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [x] **Node.js/Express HTTP service** - I use node.js and express
 - [x] **Static middleware for frontend** - public files expressed using express
-- [x] **Calls to third party endpoints** - 3rd party jokes and random facts indluded in competitor sreen
+- [x] **Calls to third party endpoints** - 3rd party jokes and random facts indluded in competitor screen
 - [x] **Frontend calls service endpoints** - 
 forntend fetches and displays backend data such as obtaining ring numbers, match numbers and scores which it then shows the competitor.
 
@@ -119,8 +119,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [x] **User registration** - users can be created and are stored in a mongo database. unique user ID generated upon user creation.
 - [x] **User login and logout** - Users are given a unique json webtoken upon login. the token persists for 12 hours(events can take all day), and are saved to the database. upon logout, used tokens are sent to a blacklist in the database so as to not be reused. when the 12 hour timer expires, a token will be automatically removed from said blacklist so as to prevent a buildup of unneccesary data.(login and logout functionality works).
-- [x] **Stores data in MongoDB** - all competitor, and event data inclding crredentials, event, ring, match, and competitor details such as their score, are all stored in the mongo database.
-- [x] **Stores credentials in MongoDB** - user credentials, unique ID are stored in database.
+- [x] **Stores data in MongoDB** - all competitor, and event data including credentials, event, ring, match, and competitor details such as their score, are all stored in the mongo database.
+- [x] **Stores credentials in MongoDB** - user credentials, unique user IDs, and unique event IDs are stored in database.
 - [x] **Restricts functionality based on authentication** - many endpoints check for a users role as part of the authentification process, prohibiting certain users from making unauthorized actions.
 
 ## 🚀 WebSocket deliverable
