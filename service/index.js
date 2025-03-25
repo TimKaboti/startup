@@ -823,6 +823,88 @@ app.get('/api/events/:id', authenticateToken, async (req, res) => {
 
 
 
+
+// ⚠️ DANGER: Clears competitors from all matches in an event
+app.patch('/api/events/:eventId/clear-all-competitors', async (req, res) => {
+    try {
+        const { eventId } = req.params;
+        if (!ObjectId.isValid(eventId)) {
+            return res.status(400).json({ message: "Invalid event ID" });
+        }
+
+        const eventsCollection = getEventsCollection();
+        const eventObjectId = new ObjectId(eventId);
+
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        // Clear competitors from all matches
+        for (const ring of event.rings) {
+            for (const match of ring.matches) {
+                match.competitors = [];
+            }
+        }
+
+        // Save changes
+        await eventsCollection.updateOne(
+            { _id: eventObjectId },
+            { $set: { rings: event.rings } }
+        );
+
+        res.status(200).json({ message: "All competitors cleared from matches." });
+    } catch (error) {
+        console.error("❌ Error clearing competitors:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
+
+// 🔧 PATCH: Repair missing _id fields in event participants
+app.patch('/api/events/:id/repair-participants', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid event ID format" });
+        }
+
+        const eventObjectId = new ObjectId(id);
+        const event = await eventsCollection.findOne({ _id: eventObjectId });
+
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        let updated = false;
+        const updatedParticipants = event.participants.map(p => {
+            if (!p._id) {
+                p._id = new ObjectId();
+                updated = true;
+            }
+            return p;
+        });
+
+        if (updated) {
+            await eventsCollection.updateOne(
+                { _id: eventObjectId },
+                { $set: { participants: updatedParticipants } }
+            );
+            return res.status(200).json({ message: "Participants repaired", updatedCount: updatedParticipants.length });
+        } else {
+            return res.status(200).json({ message: "No repairs needed" });
+        }
+
+    } catch (error) {
+        console.error("❌ Error repairing participants:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
 // const path = require("path");
 
 // Serve frontend static files
