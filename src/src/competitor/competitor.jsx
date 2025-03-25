@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import './competitor.css';
+import { getAuthHeaders } from '../utils/api'; // Adjust path if necessary
+
 
 export function Competitor() {
     const [competitor, setCompetitor] = useState({ name: '', age: '', rank: '', id: null });
@@ -41,7 +43,10 @@ export function Competitor() {
         if (competitor.id && eventId) {
             const fetchCompetitorMatches = async () => {
                 try {
-                    const response = await fetch(`/api/events/${eventId}/competitor/${competitor.id}/matches`);
+                    const response = await fetch(`/api/events/${eventId}/competitor/${competitor.id}/matches`, {
+                        method: "GET",
+                        headers: getAuthHeaders(),
+                    });
                     if (response.ok) {
                         const data = await response.json();
                         console.log("🔥 Matches Loaded into State:", data);

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import './admin.css';
+import { getAuthHeaders } from '../utils/api'; // Adjust path if necessary
+
 
 export function Admin() {
     const { eventId } = useParams();
@@ -46,7 +48,7 @@ export function Admin() {
 
             const response = await fetch(`/api/events/${eventId}/rings`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
             });
 
             if (!response.ok) {
@@ -73,7 +75,8 @@ export function Admin() {
 
             const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders()
+                ,
             });
 
             if (!response.ok) {
@@ -107,7 +110,8 @@ export function Admin() {
             const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches/${matchId}/add-competitor`, {
 
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders()
+                ,
                 body: JSON.stringify({ competitor }),
             });
 
@@ -143,7 +147,8 @@ export function Admin() {
 
             const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches/${matchId}/update-score`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: getAuthHeaders()
+                ,
                 body: JSON.stringify({ competitorId, score: newScore }),
             });
 
@@ -189,7 +194,8 @@ export function Admin() {
 
             const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches/${matchId}/mark-ongoing`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders()
+                ,
             });
 
             if (!response.ok) {
@@ -226,7 +232,8 @@ export function Admin() {
 
             const response = await fetch(`/api/events/${eventId}/rings/${ringId}/matches/${matchId}/mark-completed`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: getAuthHeaders()
+                ,
             });
 
             if (!response.ok) {

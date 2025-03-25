@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './events.css';
 import ErrorBoundary from './ErrorBoundary';
+import { getAuthHeaders } from '../utils/api';
 
 export function Events() {
     const navigate = useNavigate();
@@ -84,9 +85,7 @@ export function Events() {
         try {
             const response = await fetch(`/api/events/${selectedEvent}/join`, {
                 method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ user }),
             });
 
@@ -132,9 +131,7 @@ export function Events() {
         try {
             const response = await fetch('/api/events', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: getAuthHeaders(),
                 body: JSON.stringify({ name: eventName }),
             });
 
