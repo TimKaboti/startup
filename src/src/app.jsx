@@ -39,7 +39,8 @@ function MainLayout({ hideHeaderFooter = false, isLoginScreen = false, children 
 
     const handleLogout = () => {
         console.log("🔒 Logging out...");
-        sessionStorage.clear();
+        sessionStorage.removeItem('authToken');
+        sessionStorage.removeItem('loggedInUser');
         setLoggedInUser(null);
         setMenuOpen(false);
         navigate("/login");

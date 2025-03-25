@@ -16,7 +16,10 @@ export function Events() {
             const response = await fetch('/api/events');
             if (response.ok) {
                 const data = await response.json();
-                setEvents(data);
+                setEvents(data.map(e => ({
+                    id: e._id,      // ✅ FIX: Use ObjectId as event.id
+                    name: e.name
+                })));
             } else {
                 console.error('Error fetching events:', response.statusText);
             }
@@ -24,6 +27,8 @@ export function Events() {
             console.error('Error fetching events:', error);
         }
     };
+
+
 
     useEffect(() => {
         fetchEvents();

@@ -16,7 +16,8 @@ export function Login() {
         event.preventDefault();
 
         try {
-            sessionStorage.clear(); // 🔥 Ensure fresh session
+            sessionStorage.removeItem('authToken');
+            sessionStorage.removeItem('loggedInUser');
 
             const response = await fetch('/api/login', {
                 method: 'POST',
@@ -93,11 +94,12 @@ export function Login() {
         }
     };
 
-    const handleLogout = () => {
-        console.log("🔒 Logging out...");
-        sessionStorage.clear();
-        navigate("/login");
-    };
+    // const handleLogout = () => {
+    //     console.log("🔒 Logging out...");
+    //     sessionStorage.removeItem('authToken');
+    //     sessionStorage.removeItem('loggedInUser');
+    //     navigate("/login");
+    // };
 
     return (
         <main className="index-main" style={{ fontFamily: 'Exo' }}>

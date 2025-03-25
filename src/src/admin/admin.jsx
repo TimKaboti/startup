@@ -12,10 +12,16 @@ export function Admin() {
     const [selectedRingId, setSelectedRingId] = useState(null);
     const [tempScores, setTempScores] = useState({});
 
+    const [eventName, setEventName] = useState('');
+
+
+
     useEffect(() => {
         const fetchRings = async () => {
             try {
-                const response = await fetch(`/api/events/${eventId}/rings`);
+                const response = await fetch(`/api/events/${eventId}/rings`, {
+                    headers: getAuthHeaders(),
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setRings(data);
@@ -27,10 +33,13 @@ export function Admin() {
         fetchRings();
     }, [eventId]);
 
+
     useEffect(() => {
         const fetchCompetitors = async () => {
             try {
-                const response = await fetch(`/api/events/${eventId}/competitors`);
+                const response = await fetch(`/api/events/${eventId}/competitors`, {
+                    headers: getAuthHeaders(),
+                });
                 if (response.ok) {
                     const data = await response.json();
                     setCompetitors(data);
@@ -41,6 +50,29 @@ export function Admin() {
         };
         fetchCompetitors();
     }, [eventId]);
+
+
+    useEffect(() => {
+        const fetchEventDetails = async () => {
+            try {
+                const response = await fetch(`/api/events/${eventId}`, {
+                    headers: getAuthHeaders(),
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setEventName(data.name);
+                } else {
+                    console.error("❌ Failed to fetch event name");
+                }
+            } catch (error) {
+                console.error("❌ Error fetching event name:", error);
+            }
+        };
+
+        fetchEventDetails();
+    }, [eventId]);
+
+
 
     const addRing = async () => {
         try {
@@ -122,7 +154,8 @@ export function Admin() {
             }
 
             const updatedMatch = await response.json();
-            console.log('✅ Competitor added to match:', updatedMatch);
+
+            updatedMatch.competitors = updatedMatch.competitors || [];
 
             setRings(prevRings =>
                 prevRings.map(ring =>
@@ -136,6 +169,7 @@ export function Admin() {
                         : ring
                 )
             );
+
         } catch (error) {
             console.error('❌ Error adding competitor to match:', error);
         }
@@ -268,7 +302,7 @@ export function Admin() {
     return (
         <main>
             <div className="main_info" style={{ fontFamily: 'Exo' }}>
-                <h2>RINGS for Event {eventId}</h2>
+                <h2>RINGS for Event: {eventName || eventId}</h2>
                 <button onClick={addRing}>Add Ring</button>
                 <div className="tab-container">
                     {rings.map((ring) => (
@@ -312,7 +346,7 @@ export function Admin() {
                                 >
                                     Add Competitor
                                 </button>
-                                {match.competitors.length > 0 ? (
+                                {Array.isArray(match.competitors) && match.competitors.length > 0 ? (
                                     <div>
                                         <button
                                             onClick={() => markMatchAsOngoing(selectedRingId, match.id)}
@@ -323,7 +357,7 @@ export function Admin() {
                                         {/* 🔹 Button to mark match as completed */}
                                         <button
                                             onClick={() => {
-                                                handleMarkMatchCompleted(selectedRingId, match.id);
+                                                markMatchAsCompleted(selectedRingId, match.id);
 
                                                 // 🔥 Temporary shading effect for 1 second
                                                 const buttonElement = document.getElementById(`complete-btn-${match.id}`);

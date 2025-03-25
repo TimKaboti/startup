@@ -433,7 +433,6 @@ app.post('/api/events/:eventId/rings/:ringId/matches', authenticateToken, async 
 });
 
 
-// all following need testing
 app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', authenticateToken, async (req, res) => {
     try {
         const eventsCollection = getEventsCollection();
@@ -735,6 +734,32 @@ app.get('/api/events/:eventId/competitor/:competitorId/matches', authenticateTok
 
     } catch (error) {
         console.error("❌ Error fetching matches for competitor:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
+// 🔹 Get details of a single event (for fetching event name by ID)
+app.get('/api/events/:id', authenticateToken, async (req, res) => {
+    try {
+        const eventsCollection = getEventsCollection();
+        const { id } = req.params;
+
+        // Validate ObjectId
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid event ID format" });
+        }
+
+        const eventId = new ObjectId(id);
+        const event = await eventsCollection.findOne({ _id: eventId }, { projection: { name: 1 } });
+
+        if (!event) {
+            return res.status(404).json({ message: "Event not found" });
+        }
+
+        res.status(200).json({ name: event.name });
+    } catch (error) {
+        console.error("❌ Error fetching event name:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
