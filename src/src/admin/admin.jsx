@@ -330,16 +330,33 @@ export function Admin() {
                                 >
                                     <option value="">Select a Competitor</option>
                                     {competitors.map((competitor) => (
-                                        <option key={competitor.id} value={JSON.stringify(competitor)}>
+                                        <option
+                                            key={competitor.id || competitor._id}
+                                            value={JSON.stringify({
+                                                ...competitor,
+                                                id: competitor.id || competitor._id,
+                                            })}
+                                        >
                                             {competitor.name}
                                         </option>
+
                                     ))}
                                 </select>
                                 <button
                                     onClick={() => {
                                         if (selectedCompetitor) {
                                             const competitorData = JSON.parse(selectedCompetitor);
-                                            addCompetitorToMatch(selectedRingId, match.id, competitorData);
+                                            const fullCompetitor = competitors.find(c => c.email === competitorData.email);
+                                            console.log("➡️ Full Competitor Being Sent:", fullCompetitor);
+
+                                            // Ensure we include the 'id' (from the `competitors` list)
+                                            addCompetitorToMatch(selectedRingId, match.id, {
+                                                id: fullCompetitor._id,
+                                                name: fullCompetitor.name,
+                                                email: fullCompetitor.email,
+                                                score: "",  // Optional: set default
+                                            });
+
                                             setSelectedCompetitor('');
                                         }
                                     }}

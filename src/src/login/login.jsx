@@ -40,7 +40,12 @@ export function Login() {
 
                 // 🔥 Ensure role is stored correctly
                 sessionStorage.setItem('authToken', data.token);
-                sessionStorage.setItem('loggedInUser', JSON.stringify({ ...data, role }));
+                sessionStorage.setItem('loggedInUser', JSON.stringify({
+                    ...data,
+                    role,
+                    id: data._id  // ✅ Fix: adds a consistent `id` field used by the frontend
+                }));
+
 
                 console.log("🔒 AuthToken Stored:", data.token);
                 console.log("🔹 User role stored:", role);
@@ -76,7 +81,10 @@ export function Login() {
                 const createdUser = await response.json();
                 console.log("✅ User created successfully:", createdUser);
 
-                sessionStorage.setItem('loggedInUser', JSON.stringify(createdUser));
+                sessionStorage.setItem('loggedInUser', JSON.stringify({
+                    ...createdUser,
+                    id: createdUser._id  // ✅ Fix: adds `id` to match usage in React
+                }));
 
                 alert('User created successfully! You can now log in.');
                 setIsCreating(false);
@@ -94,12 +102,6 @@ export function Login() {
         }
     };
 
-    // const handleLogout = () => {
-    //     console.log("🔒 Logging out...");
-    //     sessionStorage.removeItem('authToken');
-    //     sessionStorage.removeItem('loggedInUser');
-    //     navigate("/login");
-    // };
 
     return (
         <main className="index-main" style={{ fontFamily: 'Exo' }}>

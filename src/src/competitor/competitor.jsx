@@ -30,12 +30,14 @@ export function Competitor() {
                 name: storedCompetitor.name,
                 age: storedCompetitor.age,
                 rank: storedCompetitor.rank,
-                id: storedCompetitor.id,
+                id: storedCompetitor._id,
             });
 
             if (storedCompetitor.eventId) {
                 setEventId(storedCompetitor.eventId);
             }
+            console.log("👤 Competitor Loaded:", storedCompetitor);
+
         }
     }, []);
 

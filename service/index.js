@@ -203,7 +203,19 @@ app.patch('/api/events/:id/join', authenticateToken, async (req, res) => {
         const eventId = new ObjectId(id); // Convert to ObjectId safely
 
         // 🔹 Get user info from the authenticated request
-        const user = { name: req.user.name, email: req.user.email };
+        const usersCollection = getUsersCollection();
+        const fullUser = await usersCollection.findOne({ email: req.user.email });
+
+        if (!fullUser || !fullUser._id) {
+            return res.status(400).json({ message: 'User not found in database' });
+        }
+
+        const user = {
+            _id: fullUser._id,  // ✅ Add MongoDB ObjectId
+            name: fullUser.name,
+            email: fullUser.email,
+        };
+
 
         if (!user.email || !user.name) {
             console.error("❌ User details missing:", user);
@@ -602,21 +614,65 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', 
 
         console.log(`✅ Found Match ${matchId}, adding competitor...`, competitor);
 
+        // ✅ Ensure competitor has a consistent `id` field
+        if (!competitor.id && competitor._id) {
+            competitor.id = competitor._id.toString();
+        }
+
         // 🔹 Check if competitor is already in the match
         const existingCompetitor = event.rings[ringIndex].matches[matchIndex].competitors.find(c => c.email === competitor.email);
         if (existingCompetitor) {
             return res.status(400).json({ message: "Competitor is already in the match" });
         }
 
+        // 🔹 Ensure competitor has an ID
+        if (!competitor.id) {
+            const participant = event.participants.find(p => p.email === competitor.email);
+            if (participant && participant._id) {
+                competitor.id = participant._id.toString(); // Ensure it's a string
+            } else {
+                return res.status(400).json({ message: "Competitor ID not found" });
+            }
+        }
+
+        console.log("🧪 Adding to event:", eventId);
+        console.log("🧪 Ring #:", ringNumber, "Match #:", matchNumber);
+        console.log("🧪 Competitor:", competitor);
+        console.log("🔎 Ring:", event.rings[ringIndex]);
+        console.log("🔎 Match:", event.rings[ringIndex].matches[matchIndex]);
+
+
         // 🔹 Add competitor to the match
+        // await eventsCollection.updateOne(
+        //     { _id: eventObjectId, "rings.id": ringNumber },
+        //     { $push: { "rings.$.matches.$[match].competitors": competitor } },
+        //     { arrayFilters: [{ "match.id": matchNumber }] }
+        // );
+
+        // 🔄 Add competitor directly in memory
+        event.rings[ringIndex].matches[matchIndex].competitors.push(competitor);
+
+        // 💾 Save entire updated matches array
         await eventsCollection.updateOne(
             { _id: eventObjectId, "rings.id": ringNumber },
-            { $push: { "rings.$.matches.$[match].competitors": competitor } },
-            { arrayFilters: [{ "match.id": matchNumber }] }
+            {
+                $set: {
+                    "rings.$.matches": event.rings[ringIndex].matches
+                }
+            }
         );
+
+
+
+
+        const updated = await eventsCollection.findOne({ _id: eventObjectId });
+        console.log("🧩 Updated match:", updated.rings[ringIndex].matches[matchIndex]);
+
 
         console.log(`✅ Competitor added to Match ${matchId} in Ring ${ringId}`);
         res.status(200).json({ message: "Competitor added successfully" });
+        res.status(200).json(event.rings[ringIndex].matches[matchIndex]);
+
 
     } catch (error) {
         console.error("❌ Error adding competitor to match:", error);
