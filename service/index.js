@@ -916,14 +916,38 @@ app.get("*", (req, res) => {
 });
 
 
-// ✅ Ensure MongoDB is connected BEFORE starting the server
-(async () => {
-    await connectDB(); // 🛠 Ensures database is connected
+// ✅ Ensure MongoDB is connected BEFORE starting the server and 
+// allow websocket to hook into HTTP server.
+const http = require('http');
+const { WebSocketServer } = require('ws');
 
-    // ✅ Place `app.listen()` here, AFTER successful connection
+// ✅ Create the HTTP server manually
+const server = http.createServer(app);
+
+// ✅ Create the WebSocket server
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (ws, req) => {
+    console.log('🌐 New WebSocket client connected');
+
+    ws.on('message', (message) => {
+        console.log(`📨 Received message: ${message}`);
+        ws.send(`🔁 Echo: ${message}`);
+    });
+
+    ws.on('close', () => {
+        console.log('❌ Client disconnected');
+    });
+});
+
+// ✅ Start HTTP + WebSocket server
+(async () => {
+    await connectDB();
     const port = process.argv.length > 2 ? process.argv[2] : 4000;
-    app.listen(port, () => console.log(`🚀 Server running on port ${port}`));
+    server.listen(port, () => console.log(`🚀 Server running (HTTP + WS) on port ${port}`));
 })();
+
+
 
 // ✅ Graceful Shutdown: Close DB connection on exit
 process.on('SIGINT', async () => {
