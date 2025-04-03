@@ -546,6 +546,20 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', au
             { $set: { "rings.$.matches": event.rings[ringIndex].matches } }
         );
 
+        // ✅ After saving the update to MongoDB
+        const message = JSON.stringify({
+            type: "score:updated",
+            eventId,
+            ringId,
+            matchId
+        });
+
+        global.wss?.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+
         console.log(`✅ Match ${matchId} in Ring ${ringId} marked as Ongoing.`);
         res.status(200).json(event.rings[ringIndex].matches[matchIndex]);
 
@@ -553,20 +567,6 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', au
         console.error("❌ Error marking match as ongoing:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-
-    // ✅ After saving the update to MongoDB
-    const message = JSON.stringify({
-        type: "score:updated",
-        eventId,
-        ringId,
-        matchId
-    });
-
-    global.wss?.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(message);
-        }
-    });
 });
 
 
@@ -619,6 +619,21 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-completed', 
             { $set: { "rings.$.matches": event.rings[ringIndex].matches } }
         );
 
+
+        const message = JSON.stringify({
+            type: "match:updated",
+            eventId,
+            ringId,
+            matchId
+        });
+
+        global.wss?.clients.forEach(client => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+
+
         console.log(`✅ Match ${matchId} in Ring ${ringId} marked as COMPLETED!`);
         res.status(200).json({ message: "Match marked as completed", match: event.rings[ringIndex].matches[matchIndex] });
 
@@ -626,20 +641,6 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-completed', 
         console.error("❌ Error marking match as completed:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-
-    const message = JSON.stringify({
-        type: "match:updated",
-        eventId,
-        ringId,
-        matchId
-    });
-
-    global.wss?.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(message);
-        }
-    });
-
 });
 
 
@@ -748,6 +749,21 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', 
         console.log("🧩 Updated match:", updated.rings[ringIndex].matches[matchIndex]);
 
 
+        // ✅ After saving the update to MongoDB
+        const message = JSON.stringify({
+            type: "competitor:added",
+            eventId,
+            ringId,
+            matchId,
+            competitor
+        });
+
+        global.wss?.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+
         console.log(`✅ Competitor added to Match ${matchId} in Ring ${ringId}`);
         res.status(200).json({ message: "Competitor added successfully" });
         res.status(200).json(event.rings[ringIndex].matches[matchIndex]);
@@ -757,23 +773,6 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', 
         console.error("❌ Error adding competitor to match:", error);
         res.status(500).json({ message: "Internal server error" });
     }
-
-
-    // ✅ After saving the update to MongoDB
-    const message = JSON.stringify({
-        type: "competitor:added",
-        eventId,
-        ringId,
-        matchId,
-        competitor
-    });
-
-    global.wss?.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-            client.send(message);
-        }
-    });
-
 });
 
 
