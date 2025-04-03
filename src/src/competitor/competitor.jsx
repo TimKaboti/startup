@@ -13,6 +13,7 @@ export function Competitor() {
     const eventName = location.state?.eventName;
     const [randomJoke, setRandomJoke] = useState('');
     const [randomFact, setRandomFact] = useState('');
+    const [queueAlertMessage, setQueueAlertMessage] = useState('');
     const WS_URL = 'ws://localhost:5173/socket'; // Vite will proxy to your backend
 
 
@@ -33,6 +34,31 @@ export function Competitor() {
                 const data = await response.json();
                 console.log("🔥 Matches Loaded into State:", data);
                 setMatches(data);
+
+                let message = "";
+
+                const ongoingMatch = data.find(match => match.status === "ongoing");
+                if (ongoingMatch) {
+                    message = "Your match is currently ongoing!";
+                } else {
+                    const upcomingMatch = data.find(match => match.status === "upcoming");
+                    if (upcomingMatch) {
+                        const ringMatches = data
+                            .filter(m => m.ringId === upcomingMatch.ringId && m.status !== "completed")
+                            .sort((a, b) => a.id - b.id);
+                        const position = ringMatches.findIndex(m => m.id === upcomingMatch.id);
+
+                        if (position > -1 && position < 5) {
+                            if (position === 0) {
+                                message = "Your match is next in line!";
+                            } else {
+                                message = `Your match is #${position + 1} in the queue.`;
+                            }
+                        }
+                    }
+                }
+
+                setQueueAlertMessage(message);
             } else {
                 console.error("❌ Error fetching competitor matches:", response.statusText);
             }
@@ -40,7 +66,6 @@ export function Competitor() {
             console.error("❌ Error fetching competitor matches:", error);
         }
     };
-
 
 
     useEffect(() => {
@@ -186,6 +211,22 @@ export function Competitor() {
             ) : (
                 <p>No matches assigned yet.</p>
             )}
+
+
+            {queueAlertMessage && (
+                <div className="queue-alert" style={{
+                    padding: "10px",
+                    margin: "20px 0",
+                    backgroundColor: "#fff3cd",
+                    border: "1px solid #ffeeba",
+                    borderRadius: "5px",
+                    color: "#856404",
+                    fontWeight: "500"
+                }}>
+                    ⚠️ {queueAlertMessage}
+                </div>
+            )}
+
 
             {/* 🔹 Random Joke and Fact Section */}
             <div className="fun-facts">

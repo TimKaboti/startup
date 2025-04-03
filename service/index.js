@@ -548,7 +548,7 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', au
 
         // ✅ After saving the update to MongoDB
         const message = JSON.stringify({
-            type: "score:updated",
+            type: "match:updated",
             eventId,
             ringId,
             matchId
