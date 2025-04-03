@@ -7,6 +7,8 @@ const { getUsersCollection, getEventsCollection } = require('./database');
 const path = require("path");
 const http = require('http');
 const { WebSocketServer } = require('ws');
+module.exports = { app, server, wss };
+global.wss = wss;
 
 
 
@@ -246,6 +248,20 @@ app.patch('/api/events/:id/join', authenticateToken, async (req, res) => {
             { $push: { participants: user } }
         );
 
+        // ✅ WebSocket Broadcast: Competitor Joined Event
+        const message = JSON.stringify({
+            type: "competitor:added",
+            eventId: id,
+            competitor: user
+        });
+
+        global.wss?.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+
+
         console.log(`✅ ${user.name} joined event ${id}`);
         res.status(200).json({ message: 'User joined successfully', eventId: id });
 
@@ -322,6 +338,20 @@ app.post('/api/events/:eventId/rings', authenticateToken, async (req, res) => {
         console.error("❌ Error adding ring:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
+    // ✅ WebSocket Broadcast: Ring Added
+    const ringMessage = JSON.stringify({
+        type: "ring:added",
+        eventId,
+        ring: newRing
+    });
+
+    global.wss?.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(ringMessage);
+        }
+    });
+
 });
 
 
@@ -437,6 +467,21 @@ app.post('/api/events/:eventId/rings/:ringId/matches', authenticateToken, async 
             { $push: { "rings.$.matches": newMatch } }
         );
 
+        // ✅ WebSocket Broadcast: Match Added
+        const message = JSON.stringify({
+            type: "match:updated",
+            eventId,
+            ringId,
+            match: newMatch
+        });
+
+        global.wss?.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+
+
         console.log(`✅ Match ${newMatchId} added to Ring ${ringId} in Event ${eventId}`);
         res.status(201).json(newMatch);
 
@@ -486,7 +531,11 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', au
         }
 
         // 🔹 Set all matches in the ring to "upcoming"
-        event.rings[ringIndex].matches.forEach(m => (m.status = "upcoming"));
+        event.rings[ringIndex].matches.forEach(m => {
+            if (m.status !== "completed") {
+                m.status = "upcoming";
+            }
+        });
 
         // 🔥 Mark the selected match as "ongoing"
         event.rings[ringIndex].matches[matchIndex].status = "ongoing";
@@ -504,6 +553,20 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-ongoing', au
         console.error("❌ Error marking match as ongoing:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
+    // ✅ After saving the update to MongoDB
+    const message = JSON.stringify({
+        type: "score:updated",
+        eventId,
+        ringId,
+        matchId
+    });
+
+    global.wss?.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
 });
 
 
@@ -563,6 +626,20 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/mark-completed', 
         console.error("❌ Error marking match as completed:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
+    const message = JSON.stringify({
+        type: "match:updated",
+        eventId,
+        ringId,
+        matchId
+    });
+
+    global.wss?.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+
 });
 
 
@@ -680,6 +757,23 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/add-competitor', 
         console.error("❌ Error adding competitor to match:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
+
+    // ✅ After saving the update to MongoDB
+    const message = JSON.stringify({
+        type: "competitor:added",
+        eventId,
+        ringId,
+        matchId,
+        competitor
+    });
+
+    global.wss?.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+
 });
 
 
@@ -751,6 +845,23 @@ app.patch('/api/events/:eventId/rings/:ringId/matches/:matchId/update-score', au
         console.error("❌ Error updating score:", error);
         res.status(500).json({ message: "Internal server error" });
     }
+
+    // ✅ After saving the update to MongoDB
+    const message = JSON.stringify({
+        type: "score:updated",
+        eventId,
+        ringId,
+        matchId,
+        competitorId,
+        score
+    });
+
+    global.wss?.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+
 });
 
 

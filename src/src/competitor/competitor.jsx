@@ -13,6 +13,7 @@ export function Competitor() {
     const eventName = location.state?.eventName;
     const [randomJoke, setRandomJoke] = useState('');
     const [randomFact, setRandomFact] = useState('');
+    const WS_URL = 'ws://localhost:5173/socket'; // Vite will proxy to your backend
 
 
     const getMatchPosition = (matchId, ringId) => {
@@ -20,6 +21,26 @@ export function Competitor() {
         const matchIndex = ringMatches.findIndex(m => m.id === matchId);
         return matchIndex !== -1 ? matchIndex + 1 : "N/A";
     };
+
+
+    const fetchCompetitorMatches = async () => {
+        try {
+            const response = await fetch(`/api/events/${eventId}/competitor/${competitor.id}/matches`, {
+                method: "GET",
+                headers: getAuthHeaders(),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                console.log("🔥 Matches Loaded into State:", data);
+                setMatches(data);
+            } else {
+                console.error("❌ Error fetching competitor matches:", response.statusText);
+            }
+        } catch (error) {
+            console.error("❌ Error fetching competitor matches:", error);
+        }
+    };
+
 
 
     useEffect(() => {
@@ -43,27 +64,46 @@ export function Competitor() {
 
     useEffect(() => {
         if (competitor.id && eventId) {
-            const fetchCompetitorMatches = async () => {
-                try {
-                    const response = await fetch(`/api/events/${eventId}/competitor/${competitor.id}/matches`, {
-                        method: "GET",
-                        headers: getAuthHeaders(),
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log("🔥 Matches Loaded into State:", data);
-                        setMatches(data);
-                    } else {
-                        console.error("❌ Error fetching competitor matches:", response.statusText);
-                    }
-                } catch (error) {
-                    console.error("❌ Error fetching competitor matches:", error);
-                }
-            };
-
             fetchCompetitorMatches();
         }
     }, [competitor.id, eventId]);
+
+
+    useEffect(() => {
+        if (!competitor.id || !eventId) return;
+
+        const socket = new WebSocket(WS_URL);
+
+        socket.onopen = () => {
+            console.log('✅ WebSocket connected (Competitor view)');
+        };
+
+        socket.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            console.log("📨 WebSocket update received:", msg);
+
+            const relevantUpdate =
+                msg.type === "competitor:added" ||
+                msg.type === "score:updated" ||
+                msg.type === "match:updated";
+
+            const isForThisEvent = msg.eventId === eventId;
+            const isForThisCompetitor =
+                !msg.competitorId || msg.competitorId === competitor.id;
+
+            if (relevantUpdate && isForThisEvent && isForThisCompetitor) {
+                fetchCompetitorMatches();
+            }
+        };
+
+
+        socket.onclose = () => {
+            console.log('❌ WebSocket disconnected (Competitor view)');
+        };
+
+        return () => socket.close();
+    }, [competitor.id, eventId]);
+
 
 
     useEffect(() => {

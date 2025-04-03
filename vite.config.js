@@ -11,9 +11,14 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'http://localhost:4000', // Forward API requests to the backend
-                changeOrigin: true, // Ensure the host header matches the target
-                secure: false, // Disable SSL verification (useful for local development)
+                target: 'http://localhost:4000',
+                changeOrigin: true,
+                secure: false,
+            },
+            // 🔥 WebSocket proxy
+            '^/socket': {
+                target: 'ws://localhost:4000',
+                ws: true,
             },
         },
     },

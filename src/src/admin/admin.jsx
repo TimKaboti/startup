@@ -73,6 +73,57 @@ export function Admin() {
     }, [eventId]);
 
 
+    useEffect(() => {
+        const socket = new WebSocket('ws://localhost:5173/socket');
+
+        socket.onopen = () => {
+            console.log('✅ WebSocket connected (Admin view)');
+        };
+
+        socket.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            console.log('📨 WebSocket update received (Admin):', msg);
+
+            const isForThisEvent = msg.eventId === eventId;
+
+            if (!isForThisEvent) return;
+
+            const relevantUpdate =
+                msg.type === "competitor:added" ||
+                msg.type === "score:updated" ||
+                msg.type === "match:updated" ||
+                msg.type === "ring:added";
+
+            if (relevantUpdate) {
+                // Re-fetch all rings (includes matches and scores)
+                fetch(`/api/events/${eventId}/rings`, {
+                    headers: getAuthHeaders(),
+                })
+                    .then(res => res.json())
+                    .then(data => setRings(data))
+                    .catch(err => console.error("❌ WebSocket-triggered ring fetch error:", err));
+            }
+
+            if (msg.type === "competitor:added") {
+                // Re-fetch competitor list too
+                fetch(`/api/events/${eventId}/competitors`, {
+                    headers: getAuthHeaders(),
+                })
+                    .then(res => res.json())
+                    .then(data => setCompetitors(data))
+                    .catch(err => console.error("❌ WebSocket-triggered competitor fetch error:", err));
+            }
+        };
+
+        socket.onclose = () => {
+            console.log('❌ WebSocket disconnected (Admin view)');
+        };
+
+        return () => socket.close();
+    }, [eventId]);
+
+
+
 
     const addRing = async () => {
         try {
