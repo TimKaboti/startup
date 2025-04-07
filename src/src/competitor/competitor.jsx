@@ -14,7 +14,7 @@ export function Competitor() {
     const [randomJoke, setRandomJoke] = useState('');
     const [randomFact, setRandomFact] = useState('');
     const [queueAlertMessage, setQueueAlertMessage] = useState('');
-    const WS_URL = 'ws://localhost:5173/socket'; // Vite will proxy to your backend
+    const WS_URL = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/socket`;
 
 
     const getMatchPosition = (matchId, ringId) => {
@@ -107,19 +107,21 @@ export function Competitor() {
             const msg = JSON.parse(event.data);
             console.log("📨 WebSocket update received:", msg);
 
-            const relevantUpdate =
-                msg.type === "competitor:added" ||
-                msg.type === "score:updated" ||
-                msg.type === "match:updated";
-
             const isForThisEvent = msg.eventId === eventId;
-            const isForThisCompetitor =
-                !msg.competitorId || msg.competitorId === competitor.id;
+            const isForThisCompetitor = msg.competitorId === competitor.id;
 
-            if (relevantUpdate && isForThisEvent && isForThisCompetitor) {
+            // 🔥 Refetch matches if this competitor's score was updated
+            if (msg.type === "score:updated" && isForThisEvent && isForThisCompetitor) {
+                console.log("🔁 Refetching matches due to score update...");
+                fetchCompetitorMatches();
+            }
+
+            // 🔥 Refetch on match status changes or new competitor assignment
+            if ((msg.type === "match:updated" || msg.type === "competitor:added") && isForThisEvent) {
                 fetchCompetitorMatches();
             }
         };
+
 
 
         socket.onclose = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import './admin.css';
 import { getAuthHeaders } from '../utils/api'; // Adjust path if necessary
@@ -11,9 +11,8 @@ export function Admin() {
     const [selectedCompetitor, setSelectedCompetitor] = useState('');
     const [selectedRingId, setSelectedRingId] = useState(null);
     const [tempScores, setTempScores] = useState({});
-
+    const selectedRingIdRef = useRef(null);
     const [eventName, setEventName] = useState('');
-
 
 
     useEffect(() => {
@@ -32,6 +31,11 @@ export function Admin() {
         };
         fetchRings();
     }, [eventId]);
+
+
+    useEffect(() => {
+        selectedRingIdRef.current = selectedRingId;
+    }, [selectedRingId]);
 
 
     useEffect(() => {
@@ -74,7 +78,8 @@ export function Admin() {
 
 
     useEffect(() => {
-        const socket = new WebSocket('ws://localhost:5173/socket');
+        const WS_URL = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/socket';
+        const socket = new WebSocket(WS_URL);
 
         socket.onopen = () => {
             console.log('✅ WebSocket connected (Admin view)');
@@ -85,8 +90,10 @@ export function Admin() {
             console.log('📨 WebSocket update received (Admin):', msg);
 
             const isForThisEvent = msg.eventId === eventId;
-
             if (!isForThisEvent) return;
+
+            // ✅ Capture selected ring ID at message arrival time
+            const prevSelectedRingId = selectedRingIdRef.current;
 
             const relevantUpdate =
                 msg.type === "competitor:added" ||
@@ -95,17 +102,20 @@ export function Admin() {
                 msg.type === "ring:added";
 
             if (relevantUpdate) {
-                // Re-fetch all rings (includes matches and scores)
                 fetch(`/api/events/${eventId}/rings`, {
                     headers: getAuthHeaders(),
                 })
                     .then(res => res.json())
-                    .then(data => setRings(data))
+                    .then(data => {
+                        setRings(data);
+                        // ✅ Try to preserve the selected ring if it's still valid
+                        const stillExists = data.some(r => r.id === prevSelectedRingId);
+                        setSelectedRingId(stillExists ? prevSelectedRingId : null);
+                    })
                     .catch(err => console.error("❌ WebSocket-triggered ring fetch error:", err));
             }
 
             if (msg.type === "competitor:added") {
-                // Re-fetch competitor list too
                 fetch(`/api/events/${eventId}/competitors`, {
                     headers: getAuthHeaders(),
                 })
@@ -114,6 +124,8 @@ export function Admin() {
                     .catch(err => console.error("❌ WebSocket-triggered competitor fetch error:", err));
             }
         };
+
+
 
         socket.onclose = () => {
             console.log('❌ WebSocket disconnected (Admin view)');

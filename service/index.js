@@ -7,8 +7,6 @@ const { getUsersCollection, getEventsCollection } = require('./database');
 const path = require("path");
 const http = require('http');
 const { WebSocketServer } = require('ws');
-module.exports = { app, server, wss };
-global.wss = wss;
 
 
 
@@ -890,7 +888,7 @@ app.get('/api/events/:eventId/competitor/:competitorId/matches', authenticateTok
         const competitorMatches = event.rings
             .flatMap(ring =>
                 ring.matches.map(match => ({
-                    matchId: match.id,  // Include match number
+                    id: match.id,  // Include match number
                     ringId: ring.id,    // Include ring number
                     competitors: match.competitors,
                     status: match.status
@@ -1030,14 +1028,16 @@ app.get("*", (req, res) => {
 
 // ✅ Ensure MongoDB is connected BEFORE starting the server and 
 // allow websocket to hook into HTTP server.
-const http = require('http');
-const { WebSocketServer } = require('ws');
+// const http = require('http');
+// const { WebSocketServer } = require('ws');
 
 // ✅ Create the HTTP server manually
 const server = http.createServer(app);
 
 // ✅ Create the WebSocket server
 const wss = new WebSocketServer({ server });
+global.wss = wss;
+
 
 wss.on('connection', (ws, req) => {
     console.log('🌐 New WebSocket client connected');
@@ -1068,3 +1068,4 @@ process.on('SIGINT', async () => {
     process.exit(0);
 });
 
+module.exports = { app, server, wss };
